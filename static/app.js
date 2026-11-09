@@ -389,9 +389,12 @@ document.addEventListener('click', async (e) => {
 });
 
 // ---------- replay: recorded utterances, original timing, same server path ----------
+let replayAudio = null;
 async function replay(name) {
   const rec = await api('/recordings/' + name);
   await api('/call/start', { caller: rec.caller });
+  if (replayAudio) { replayAudio.pause(); replayAudio = null; }
+  if (rec.audio) { replayAudio = new Audio(rec.audio); replayAudio.play().catch((e) => console.warn('audio blocked', e)); }
   const t0 = performance.now();
   for (const u of rec.utterances) {
     const wait = u.t * 1000 - (performance.now() - t0);
@@ -692,7 +695,7 @@ async function story() {
 
     caption('11:02', '“Grandma, it\'s me, Ji-hoon. My phone broke…” — a voice that sounds exactly like him.');
     await api('/presence', { member: 'jihoon', on_call: false });
-    const rec = S.recordings.includes('scam') ? 'scam' : (S.recordings.includes('scam_api') ? 'scam_api' : null);
+    const rec = ['scam_clone', 'scam', 'scam_tts', 'scam_api'].find((r) => S.recordings.includes(r)) || null;
     if (rec) {
       replay(rec);
       await waitFor(() => S.call.confirm_requested, 40000);
