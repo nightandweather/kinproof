@@ -753,15 +753,17 @@ async function story() {
   try {
     setView('demo');
     await api('/reset', {}); seenEvents.clear(); seenLines.clear(); lastWikiPageHighlight = 0;
-    caption('', '');
+    caption('', "Hi, I'm Kanghoun. This is Kinproof. It makes sure a caller is really your family, before anyone sends money.");
     slide(`<div class="s-logo">K</div><h1>Kinproof</h1><h2>Family security for the age of voice cloning.<br>It checks that a caller is really your family before anyone sends money.</h2>`);
     await beat(5500);
+    caption('', 'Last year, Koreans lost 1.26 trillion won to voice phishing. That\'s up 47 percent.');
     slide(`<h2>Voice phishing in Korea, 2025</h2><div class="stats">
       <div class="stat"><b>₩1.26T</b><span>lost to voice phishing</span></div>
       <div class="stat"><b>+47%</b><span>vs. the year before</span></div>
       <div class="stat"><b>₩53.8M</b><span>lost per victim</span></div></div>
       <div class="src">Police data via National Assembly analysis</div>`);
     await beat(6000);
+    caption('', 'Older people are hit the hardest. Phone numbers leak, voices get cloned, and a parent living alone is the easiest target.');
     slide(`<h2>Older adults are hit hardest</h2><div class="stats">
       <div class="stat"><b>$7.75B</b><span>lost by people 60+ in the US, 2025</span></div>
       <div class="stat"><b>+59%</b><span>in one year</span></div></div>
