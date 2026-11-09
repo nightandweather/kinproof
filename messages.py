@@ -63,9 +63,9 @@ def receive(member: str, sender: str, text: str) -> dict:
     g = config.MEMBERS[member]["name"]
     if risk == "high":
         if out["kind"] in ("transfer", "payment"):
-            text_ = f"💸 {g} 계좌에서 {amount:,}원 출금 — {', '.join(reasons)}. 은행에 지급정지를 요청할까요?"
+            text_ = f"💸 {g} 계좌에서 {amount:,}원 출금, {', '.join(reasons)}. 은행에 지급정지를 요청할까요?"
         else:
-            text_ = f"📩 {g}께 스미싱 의심 문자가 왔어요: “{out['summary_ko']}” — 링크를 누르지 마시라고 안내했어요."
+            text_ = f"📩 {g}께 스미싱 의심 문자가 왔어요: “{out['summary_ko']}”, 링크를 누르지 마시라고 안내했어요."
             state.notify(member, "alert", "🔊 이 문자의 링크는 누르지 마세요. 가족에게 알렸어요.")
         for who in {config.CAREGIVER, getattr(config, "ADMIN", config.CAREGIVER)}:
             state.notify(who, "alert", text_, msg=msg["id"])
@@ -80,7 +80,7 @@ def hold(member: str, msg_id: str) -> bool:
         if not m or m.get("held"):
             return False
         m["held"] = config.MEMBERS[member]["name_en"]
-    state.log(f"{config.MEMBERS[member]['name_en']} requested a payment hold for {m['amount']:,}원 — SIMULATED, no bank contacted", "message")
+    state.log(f"{config.MEMBERS[member]['name_en']} requested a payment hold for {m['amount']:,}원, SIMULATED, no bank contacted", "message")
     for who in config.MEMBERS:
         if who != config.PROTECTED:
             state.notify(who, "info", f"🏦 {m['amount']:,}원 지급정지 요청 완료 (데모: 실제 은행 연동 없음)")

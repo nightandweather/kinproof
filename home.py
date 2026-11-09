@@ -57,7 +57,7 @@ def command(member: str, text: str) -> dict:
     reply = out["reply"]
     if d == "refuse":
         reply = "안전을 위해 현관문·가스·불은 원격으로 조작하지 않아요. 할머니께 직접 전화해 주세요."
-        state.log("refused: unsafe remote action (door/gas/fire) — blocked in code", "device")
+        state.log("refused: unsafe remote action (door/gas/fire), blocked in code", "device")
     elif d == "speaker":
         _speak(out["say"] or text)
     elif d == "lights":

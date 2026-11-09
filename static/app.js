@@ -94,7 +94,7 @@ function renderCall() {
   const who = c.claimed && S.members[c.claimed] ? S.members[c.claimed].name_en : '';
   if (c.verdict === 'blocked') { v.className = 'verdict blocked'; v.textContent = `This is NOT ${who}. Call blocked.`; }
   else if (c.verdict === 'verified') { v.className = 'verdict verified'; v.textContent = `Verified: it's really ${who}`; }
-  else if (c.degraded) { v.className = 'verdict degraded'; v.textContent = '⚠ Guardian degraded — family alerted'; }
+  else if (c.degraded) { v.className = 'verdict degraded'; v.textContent = '⚠ Guardian degraded, family alerted'; }
   else v.className = 'verdict hidden';
 
   const tr = $('transcript');
@@ -104,12 +104,12 @@ function renderCall() {
 
   $('signals').html = c.signals.map((s) => {
     const cls = s.by === 'code' ? 'code' : (s.type === 'CONTEXT_CONTRADICTION' ? 'wiki' : '');
-    const wq = s.wiki_quote ? `<div class="wq">📚 wiki/${esc(s.wiki_page)}.md — “${esc(s.wiki_quote)}”</div>` : '';
+    const wq = s.wiki_quote ? `<div class="wq">📚 wiki/${esc(s.wiki_page)}.md, “${esc(s.wiki_quote)}”</div>` : '';
     return `<div class="chip ${cls}"><span class="pts">+${WEIGHTS[s.type] ?? ''}${s.by === 'code' ? ' · code' : ''}</span>
       <div class="type">${esc(TYPE_LABEL[s.type] || s.type)}</div>
       <div class="q">“${esc(s.quote)}”</div><div class="en">${esc(s.quote_en)}</div>${wq}</div>`;
   }).join('');
-  $('dropped').textContent = c.dropped.length ? `${c.dropped.length} model claim(s) dropped — evidence not found in source` : '';
+  $('dropped').textContent = c.dropped.length ? `${c.dropped.length} model claim(s) dropped, evidence not found in source` : '';
 }
 
 function renderPeople() {
@@ -203,7 +203,7 @@ function renderAgenda() {
     const ck = (e.confirmed_by || []).length ? `<span class="ck">✓ ${esc(e.confirmed_by.join(', '))}</span>` : '';
     return `<div class="ag"><div class="when bg-${e.owner}">${dayLabel(e.date)}<small>${esc(e.time || 'all day')}</small></div>
       <div class="what"><b>${esc(e.title)}</b><span class="who">${esc(people)}</span></div>${ck}</div>`;
-  }).join('') || `<div class="dropped" style="color:var(--faint)">No events yet — sync a family member's AI chat.</div>`;
+  }).join('') || `<div class="dropped" style="color:var(--faint)">No events yet, sync a family member's AI chat.</div>`;
 }
 
 function renderPrompter() {
@@ -215,7 +215,7 @@ function renderPrompter() {
   $('prompter-title').textContent = { scam: 'Scammer as Dad', scam_teen: 'Scammer as Ji-hoon (15)', real_dad: 'The real Dad' }[script] || script;
   const said = Math.max(0, S.call.transcript.length - prompterBase);
   $('prompter-lines').html = lines.map((l, i) => `<div class="pl ${i < said ? 'done' : i === said ? 'now' : ''}">${esc(l)}</div>`).join('')
-    + (said >= lines.length ? '<div class="pl now">Done — press End call and save it</div>' : '');
+    + (said >= lines.length ? '<div class="pl now">Done, press End call and save it</div>' : '');
 }
 
 
@@ -229,14 +229,14 @@ function renderIdCheck() {
   const row = (st, icon, label, detail) => `<div class="ck ${st}"><span class="ic">${icon}</span>${label}<span class="dt">${detail}</span></div>`;
   const onCall = S.members[m].on_call;
   const rows = [
-    row('neutral', '🎙', `Voice sounds like ${who}`, 'not trusted — clones sound the same'),
-    row(onCall ? 'ok' : 'bad', onCall ? '✓' : '✗', `${who}'s phone is on a call`, onCall ? 'yes' : 'no — not calling anyone'),
+    row('neutral', '🎙', `Voice sounds like ${who}`, 'not trusted, clones sound the same'),
+    row(onCall ? 'ok' : 'bad', onCall ? '✓' : '✗', `${who}'s phone is on a call`, onCall ? 'yes' : 'no, not calling anyone'),
     c.claimed_location
       ? row(types.has('GPS_MISMATCH') ? 'bad' : 'ok', types.has('GPS_MISMATCH') ? '✗' : '✓', 'Location matches GPS', `says ${esc(c.claimed_location)} · GPS ${esc(S.members[m].gps)}`)
       : row('', '–', 'Location matches GPS', `GPS ${esc(S.members[m].gps)}`),
     row(types.has('CONTEXT_CONTRADICTION') ? 'bad' : 'ok', types.has('CONTEXT_CONTRADICTION') ? '✗' : '✓', 'Story matches family wiki', types.has('CONTEXT_CONTRADICTION') ? 'contradiction' : 'consistent'),
     c.verdict ? row(c.verdict === 'verified' ? 'ok' : 'bad', c.verdict === 'verified' ? '✓' : '✗', `${who} confirmed`, c.verdict === 'verified' ? "“It's me”" : '“Not me”')
-      : row(c.confirm_requested ? 'wait' : '', c.confirm_requested ? '…' : '–', `${who} confirmed`, c.confirm_requested ? 'asked — waiting' : 'not needed'),
+      : row(c.confirm_requested ? 'wait' : '', c.confirm_requested ? '…' : '–', `${who} confirmed`, c.confirm_requested ? 'asked, waiting' : 'not needed'),
   ];
   const bad = rows.filter((r) => r.includes('ck bad')).length;
   const verdict = c.verdict === 'blocked' || bad >= 2 ? `<div class="idverdict bad">✗ Not ${who}</div>`
@@ -260,7 +260,7 @@ function renderOutside() {
   const person = ev === 'stranger' ? `<text x="88" y="128" font-size="15">🕵</text><text x="106" y="140" font-size="9.5" font-weight="800" fill="#c92a2a">loitering 5 min</text>`
     : ev === 'wander' ? `<text x="310" y="60" font-size="15">👵</text><path d="M120 118 Q 200 110 310 56" stroke="#fab005" stroke-width="2" stroke-dasharray="4 4" fill="none"/><text x="230" y="80" font-size="9.5" font-weight="800" fill="#e67700">23:40 alone → bus stop</text>`
     : ev === 'home' ? `<text x="112" y="118" font-size="13">👵✓</text>` : '';
-  const st = { patrol: '🚁 Patrolling the complex', stranger: '⚠ Stranger at 101동 entrance — photo sent to Mom & Dad', wander: '⚠ Grandma out alone at night — drone following, family has live location', home: '✓ Grandma back home' }[ev] || '';
+  const st = { patrol: '🚁 Patrolling the complex', stranger: '⚠ Stranger at 101동 entrance, photo sent to Mom & Dad', wander: '⚠ Grandma out alone at night, drone following, family has live location', home: '✓ Grandma back home' }[ev] || '';
   $('yard').html = `<svg viewBox="0 0 380 190" preserveAspectRatio="xMidYMid meet" font-family="inherit">
     <rect x="6" y="6" width="368" height="178" rx="12" fill="#e9f5e1" stroke="#8ce99a" stroke-width="2"/>
     <rect x="6" y="176" width="368" height="8" fill="#ced4da"/><text x="300" y="172" font-size="9" fill="#868e96">road · 정문</text>
@@ -288,11 +288,11 @@ function renderYard() {
   const sp = (S.spill || {}).stage || 'none';
   const [rx, ry] = ['detect', 'cleaning'].includes(sp) ? [60, 70] : (ROBOT_AT[r.stage] || ROBOT_AT.docked);
   const carry = ['pills', 'deliver', 'taken', 'no_answer'].includes(r.stage) ? '🥤💊' : r.stage === 'water' ? '🥤' : '';
-  const spillSt = { detect: '📸 Water on kitchen floor — fall risk', cleaning: '🧽 Mopping…', done: '✓ Floor dry — photos sent to Mom' }[sp];
-  const robotSt0 = { docked: '🤖 Robot charging', start: '🤖 Medicine time — to the kitchen', water: '🤖 Got water', pills: `🤖 Got today's ${r.med}`,
-    deliver: '🤖 Delivered — “약 드셨어요?”', taken: `✓ Grandma took ${r.med}`, no_answer: '⚠ No answer — Mom alerted' }[r.stage] || '';
+  const spillSt = { detect: '📸 Water on kitchen floor, fall risk', cleaning: '🧽 Mopping…', done: '✓ Floor dry, photos sent to Mom' }[sp];
+  const robotSt0 = { docked: '🤖 Robot charging', start: '🤖 Medicine time, to the kitchen', water: '🤖 Got water', pills: `🤖 Got today's ${r.med}`,
+    deliver: '🤖 Delivered, “약 드셨어요?”', taken: `✓ Grandma took ${r.med}`, no_answer: '⚠ No answer, Mom alerted' }[r.stage] || '';
   const robotSt = spillSt && sp !== 'done' ? spillSt : robotSt0;
-  const doorSt = p.status === 'docked' ? '' : p.status === 'dispatched' ? ' · 🚪 door camera checking…' : p.known ? ' · ✓ family at the door' : ' · ⚠ stranger at the door — Mom alerted';
+  const doorSt = p.status === 'docked' ? '' : p.status === 'dispatched' ? ' · 🚪 door camera checking…' : p.known ? ' · ✓ family at the door' : ' · ⚠ stranger at the door, Mom alerted';
   const washing = (S.ingest_log || []).some((l) => l.includes('washer'));
   const home = S.home || { bath: {}, lights: {}, speaker: '' };
   const bath = home.bath || {};
@@ -542,7 +542,7 @@ function renderHub() {
   if (todoMode === 'chores') { renderChores(); }
   const todos = todoMode === 'chores' ? (S.chores || []).filter((c) => c.member === hubMe).map((c) => ({ done: c.done })) : myTodos(hubMe);
   if (todoMode !== 'chores') $('hub-todos').html = todos.map((t) => `<div class="todo ${t.done ? 'done' : ''}" data-todo="${t.id}"><span class="box">${t.done ? '✓' : ''}</span>
-    <span class="tx">${esc(t.text)}<span class="when">${esc(t.when)}</span></span></div>`).join('') || '<div class="empty" style="color:var(--faint)">Nothing yet — sync an AI chat.</div>';
+    <span class="tx">${esc(t.text)}<span class="when">${esc(t.when)}</span></span></div>`).join('') || '<div class="empty" style="color:var(--faint)">Nothing yet, sync an AI chat.</div>';
 
   $('hub-people').html = Object.entries(S.members).map(([m, v]) => {
     const claimedNow = c.active && c.claimed === m && !v.on_call;
@@ -551,7 +551,7 @@ function renderHub() {
       : v.on_call ? '<span class="st on">📞 on a call</span>'
       : v.dnd ? `<span class="st dnd">🔕 ${esc(v.status || 'at work')}</span>` : `<span class="st">🏠 ${esc(v.status || 'available')}</span>`;
     return `<div class="person"><div class="av" style="background:${AV_BG[m] || '#f1f3f5'}">${v.emoji}</div>
-      <div class="nm">${esc(v.name_en)}</div><div class="gps">📍 ${esc(v.gps || '—')}</div>${st}</div>`;
+      <div class="nm">${esc(v.name_en)}</div><div class="gps">📍 ${esc(v.gps || ', ')}</div>${st}</div>`;
   }).join('') + `<div class="person add" data-add-member="1"><span class="plus">＋</span>Add family</div>`;
 
   const done = todos.filter((t) => t.done).length, total = todos.length;
@@ -686,7 +686,7 @@ function renderTopics() {
     const el = $('private-' + m);
     if (!el) continue;
     const mine = (S.private_topics || []).filter((p) => p.member === m);
-    el.html = mine.length ? `<div class="sys">Kept private from your chat — only labels, never content</div>` + mine.map((p) =>
+    el.html = mine.length ? `<div class="sys">Kept private from your chat, only labels, never content</div>` + mine.map((p) =>
       `<div class="pt"><span>🔒</span><span class="lb">${esc(p.topic)}<small>${m === 'dad' ? 'only you can see this' : p.shared ? 'Dad can see this label' : 'only you can see this'}</small></span>
        ${m === 'dad' ? '' : `<button class="${p.shared ? 'on' : ''}" data-topic="${p.id}">${p.shared ? 'Shared' : 'Share label with Dad'}</button>`}</div>`).join('') : '';
   }
@@ -724,7 +724,8 @@ const SHOW_CAPTIONS = new URLSearchParams(location.search).get('cap') !== '0';
 function caption(time, text) {
   const el = $('caption');
   if (!SHOW_CAPTIONS) { el.classList.add('hidden'); return; }
-  if (!text) { el.classList.add('hidden'); return; }
+  if (!text) { el.classList.add('hidden'); document.body.classList.remove('has-cap'); return; }
+  document.body.classList.add('has-cap');
   $('cap-time').textContent = time || ''; $('cap-text').textContent = text;
   el.classList.remove('hidden'); el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
 }
@@ -735,16 +736,16 @@ async function story() {
   try {
     setView('demo');
     await api('/reset', {}); seenEvents.clear(); seenLines.clear(); lastWikiPageHighlight = 0;
-    caption('', '2025: SIM data of millions leaked. Your number can be cloned. Your voice too.'); await sleep(3500);
-    caption('', "My mother, 78, lives alone. My wife is a nurse, my son Ji-hoon is 15 and at hagwon every night. I'm a developer in Pangyo."); await sleep(3800);
-    caption('08:50', 'Each of us installs Kinproof. Protection starts only when everyone agrees.');
+    caption('', 'Last year millions of SIM records leaked. A phone number can be copied. So can a voice.'); await sleep(3500);
+    caption('', "This is my family. My mother lives alone. My wife is a nurse. My son is 15. I write code in Pangyo."); await sleep(3800);
+    caption('08:50', 'We all install Kinproof. It only turns on when everyone says yes.');
     for (const m of ['grandma', 'dad', 'mom', 'jihoon']) { await sleep(450); await api('/consent', { member: m, share: true, onboarding: true }); }
     await sleep(1500);
 
     setView('hub'); homeMode = 'in';
-    caption('09:00', "Medicine time. The home robot brings Grandma water and today's blood-pressure pills.");
+    caption('09:00', "9am. The robot brings my mother her blood pressure pills and a glass of water.");
     $('btn-med').click(); await sleep(6500);
-    caption('10:40', 'The robot spots water on the kitchen floor — a slip-and-fall risk. It warns Grandma, mops it up, and sends my wife before/after photos.');
+    caption('10:40', 'Water on the kitchen floor. The robot warns her, wipes it up, and sends my wife a photo.');
     $('btn-spill').click(); await sleep(5600);
 
     setView('demo');
@@ -755,52 +756,52 @@ async function story() {
       for (const a of S.approvals.filter((a) => a.member === m)) { await api('/approvals/' + a.id, { decision: 'approve' }); await sleep(200); }
       await sleep(900);
     };
-    await syncAndShare('mom', 'mom_chatgpt', ['09:20', "My wife tells ChatGPT she's taking Grandma to the hospital Thursday. Kinproof shares the appointment — not the chat. Her job worries stay private."]);
-    await syncAndShare('dad', 'dad_chatgpt', ['09:30', "My ChatGPT knows I'm at the Pangyo office all week and booked Friday dinner. That's shared. My stock losses aren't."]);
-    await syncAndShare('jihoon', 'jihoon_claude', ['09:35', "Ji-hoon's Claude has his hagwon schedule. Who he has a crush on stays with him."]);
+    await syncAndShare('mom', 'mom_chatgpt', ['09:20', "My wife tells ChatGPT about my mother's MRI on Thursday. The date gets shared. Her job stress doesn't."]);
+    await syncAndShare('dad', 'dad_chatgpt', ['09:30', "My ChatGPT knows I'm in Pangyo all week. That gets shared. My stock losses don't."]);
+    await syncAndShare('jihoon', 'jihoon_claude', ['09:35', "Ji-hoon's hagwon schedule gets shared. His crush stays private."]);
 
-    caption('10:10', 'Grandma just talks. No apps, no menus.');
+    caption('10:10', "My mother doesn't do apps. She just asks.");
     const r = await api('/voice', { member: 'grandma', text: '이번 주 금요일에 뭐 있어?' });
     if (r.reply) STT.say(r.reply);
     await sleep(4200);
 
-    caption('11:02', '“Mom, it\'s me, Jun-ho. My phone broke…” — a scammer with my voice, cloned from ten seconds of video.');
+    caption('11:02', '11am. “Mom, it\'s Jun-ho. My phone broke…”');
     await api('/presence', { member: 'dad', on_call: false });
     // If a voice-clone recording exists, play it (the scammer IS the clone). Otherwise the presenter reads the lines live.
     const clone = ['scam_clone'].find((r) => S.recordings.includes(r));
     if (clone) {
       replay(clone);
       await waitFor(() => S.call.transcript.length >= 1, 30000);
-      caption('11:02', 'This is my voice — cloned in one minute — calling my mother.');
+      caption('11:02', 'That\'s my voice. Cloned in one minute.');
     } else {
       script = 'scam'; prompterBase = 0; prompterOpen = true;
       await api('/call/start', { caller: '010-****-7741' });
       callListening = true;
       STT.start({ onFinal: sendUtterance, onInterim: (t) => ($('interim').textContent = t) });
-      caption('11:02', 'Read the lines on screen — in Korean, as the scammer.');
+      caption('11:02', 'Read the Korean lines on screen, as the scammer.');
       await waitFor(() => S.call.transcript.length >= 1, 60000);
-      caption('11:02', 'A scammer with my voice is calling my mother.');
+      caption('11:02', 'Someone is calling my mother with my voice.');
     }
     await waitFor(() => S.call.confirm_requested, 60000);
-    caption('11:02', "My phone isn't on any call and I'm in a meeting with Do Not Disturb on. Kinproof breaks through DND and asks me: “Is this you?”");
+    caption('11:02', "I'm in a meeting. My phone is on silent and not on any call. So Kinproof asks me directly: is this you?");
     await waitFor(() => S.call.signals.some((s) => s.type === 'GPS_MISMATCH'), 60000);
-    caption('11:03', 'The caller says Busan. My phone says Pangyo. The family wiki agrees with my phone.');
+    caption('11:03', 'He says he\'s in Busan. My phone is in Pangyo.');
     const lines = (S.scripts || {}).scam || [];
     await waitFor(() => S.call.transcript.length >= lines.length || (S.call.level === 'ALERT' && S.call.transcript.length >= 5), 60000);
     await sleep(1500);
     if (!clone) { STT.stop(); callListening = false; prompterOpen = false; $('interim').textContent = ''; }
-    caption('11:03', 'I tap “Not me”. Blocked. My wife gets the reasons — and a one-tap 112 report.');
+    caption('11:03', 'I tap Not me. The call is blocked. My wife sees why, and can report it to 112 in one tap.');
     await api('/call/confirm', { member: 'dad', is_me: false }); await sleep(3800);
 
     setView('hub');
-    caption('11:05', 'Home Protector: the whole family on one screen — calendar, to-dos, and a log of every decision the agent made.'); await sleep(4000);
+    caption('11:05', 'Everything the family needs, on one screen. Every decision is logged.'); await sleep(4000);
     homeMode = 'out'; render();
-    caption('23:40', 'Late at night Grandma walks out of the building alone. The patrol drone follows at a distance and the family gets her live location — until she is safely home.');
+    caption('23:40', '11:40pm. My mother walks out alone. The drone follows her and we can see where she is until she gets home.');
     $('btn-wander').click(); await sleep(6500);
     homeMode = 'in';
 
 
-    caption('', "Kinproof. Voice isn't proof anymore — family is."); await sleep(3500);
+    caption('', "Kinproof. A voice isn't proof anymore. Family is."); await sleep(3500);
   } finally {
     caption('', ''); storyRunning = false; B.textContent = '▶ Story mode';
   }

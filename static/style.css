@@ -542,3 +542,8 @@ body.rec .controls, body.rec .views, body.rec #msg-select{display:none!important
 .rg-sub{color:#adb5bd;font-size:15px}
 .rg-btn{margin-top:10px;background:var(--mine);color:#191919;border:0;border-radius:16px;padding:14px 28px;font-size:18px;font-weight:900}
 .rg-count{font-size:72px;font-weight:900;min-height:84px}
+
+/* captions live in their own bottom strip so they never cover the phones */
+.caption{top:auto;bottom:14px;max-width:min(1100px,94vw)}
+body.has-cap main.stage, body.has-cap main.hub, body.has-cap main.mapview, body.has-cap main.wikiview, body.has-cap main.communityview{padding-bottom:84px}
+.prompter{bottom:auto;top:110px}

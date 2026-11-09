@@ -204,7 +204,7 @@ def add_member(body: MemberIn):
         state.S["members"][mid] = {"name": body.name or body.name_en, "name_en": body.name_en, "emoji": body.emoji,
                                    "gps": body.gps, "role": body.role, "on_call": False}
         state.S["wiki"].setdefault(mid, f"# {body.name or body.name_en}\n")
-    state.log(f"added family member {body.name_en} — wiki/{mid}.md created", "wiki")
+    state.log(f"added family member {body.name_en}, wiki/{mid}.md created", "wiki")
     return {"id": mid}
 
 
@@ -259,7 +259,7 @@ def consent(body: Consent):
 
 @app.post("/api/topics/{tid}/share")
 def share_topic(tid: str):
-    """The member — not the admin — decides whether a kept-private topic label is visible to the admin."""
+    """The member, not the admin, decides whether a kept-private topic label is visible to the admin."""
     with state.LOCK:
         for pt in state.S["private_topics"]:
             if pt["id"] == tid:
@@ -389,7 +389,7 @@ def report(body: Report):
             pack = {"time": state.now(), "last_seen": "단지 정문 → 버스정류장 방향 (drone)"}
             summary = "missing-person request with drone live location"
         state.S["reports"].append({"kind": body.kind, "by": body.member, "ts": state.now(), "pack": pack})
-    state.log(f"{who} confirmed 112 report ({body.kind}): {summary} — SIMULATED, nothing dialed", "report")
+    state.log(f"{who} confirmed 112 report ({body.kind}): {summary}, SIMULATED, nothing dialed", "report")
     for m in config.MEMBERS:
         if m != config.PROTECTED:
             state.notify(m, "info", f"🚨 {config.MEMBERS[body.member]['name']}가 112에 신고했어요 ({'보이스피싱' if body.kind == 'scam' else '실종 우려'}). 증거 묶음 전송 완료 (데모: 실제 발신 없음)")

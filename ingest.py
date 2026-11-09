@@ -117,7 +117,7 @@ def process_file(path) -> None:
     try:
         process_text(member, source, body, path.name)
     except llm.LLMError as e:
-        state.log(f"{path.name}: LLM failed — {e}", "error")
+        state.log(f"{path.name}: LLM failed, {e}", "error")
     finally:
         path.rename(config.PROCESSED_DIR / path.name)
         state.persist()
@@ -142,7 +142,7 @@ def approve(approval_id: str, decision: str) -> bool:
             state.log(f"wiki/{page}.md += {p['text']}", "wiki")
         elif (dup := _duplicate_of(p)) is not None:
             dup.setdefault("confirmed_by", []).append(who)
-            state.log(f"merged duplicate: {dup['title']} — also confirmed by {who}", "schedule")
+            state.log(f"merged duplicate: {dup['title']}, also confirmed by {who}", "schedule")
         else:
             ev = {"id": state.new_id("e"), "title": p["title"], "date": p["date"], "time": p["time"],
                   "owner": p["owner"], "involves": p["involves"], "done": False, "confirmed_by": [who]}

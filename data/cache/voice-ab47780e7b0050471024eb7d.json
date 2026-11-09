@@ -1,0 +1,9 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "intent": "ask",
+  "target": null,
+  "message": null,
+  "reply": "이번 주 금요일(13일)에는 오후 6시에 지훈이 수학학원이 있고, 오후 7시에 고메스퀘어에서 가족 저녁 식사가 있어요."
+ }
+}

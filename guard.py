@@ -49,7 +49,7 @@ def start(caller: str):
         c.update(active=True, caller=caller, started=time.time())
         state.S["members"][config.PROTECTED]["on_call"] = True
     g = config.MEMBERS[config.PROTECTED]["name_en"]
-    state.log(f"📞 {g} is on a call with {caller} — transcription started", "call")
+    state.log(f"📞 {g} is on a call with {caller}, transcription started", "call")
     with state.LOCK:
         n = state.S["community"]["blocklist"].get(caller, 0)
         if n:
@@ -160,7 +160,7 @@ def _rescore():
         why = c["explain"][0] if c.get("explain") and c["explain"][0] else ""
         for who in {config.CAREGIVER, getattr(config, "ADMIN", config.CAREGIVER)}:
             state.notify(who, "alert",
-                         f"{config.MEMBERS[config.PROTECTED]['name']} 통화 위험도 {c['score']} — 사기 의심. {why}",
+                         f"{config.MEMBERS[config.PROTECTED]['name']} 통화 위험도 {c['score']}, 사기 의심. {why}",
                          evidence=[s["quote"] for s in c["signals"]][:4])
 
 
@@ -201,7 +201,7 @@ def utterance(text: str) -> dict:
         if out["claimed_identity"] and not c["claimed"]:
             c["claimed"] = out["claimed_identity"]
             label = "an authority" if c["claimed"] == "authority" else config.MEMBERS.get(c["claimed"], {}).get("name_en", c["claimed"])
-            state.log(f"caller claims to be {label} — verifying identity", "call")
+            state.log(f"caller claims to be {label}, verifying identity", "call")
         if out.get("claimed_location") and not c.get("claimed_location") and contains(transcript, out["claimed_location"]):
             c["claimed_location"] = out["claimed_location"]
         have = {s["type"] for s in c["signals"]}
@@ -241,10 +241,10 @@ def confirm(member: str, is_me: bool):
         state.log(f"{member} answered {'It is me' if is_me else 'Not me'} → call {c['verdict']}", "verdict")
         name = config.MEMBERS[member]["name"]
         if is_me:
-            state.notify(config.CAREGIVER, "info", f"{name} 본인 확인 완료 — 안전한 통화예요.")
+            state.notify(config.CAREGIVER, "info", f"{name} 본인 확인 완료, 안전한 통화예요.")
         else:
             for who in {config.CAREGIVER, getattr(config, "ADMIN", config.CAREGIVER)}:
-                state.notify(who, "alert", f"{_josa(name, '가')} '본인 아님'을 확인 — 통화를 차단했어요.")
+                state.notify(who, "alert", f"{_josa(name, '가')} '본인 아님'을 확인, 통화를 차단했어요.")
             state.notify(config.PROTECTED, "alert", f"이 전화는 {_josa(name, '가')} 아니에요. 끊으세요.")
 
 
