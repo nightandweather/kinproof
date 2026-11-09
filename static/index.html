@@ -26,10 +26,12 @@
     <button id="btn-call" class="primary">📞 Start live call</button>
     <button id="btn-end">End call</button>
     <select id="replay-select"><option value="">Replay…</option></select>
+    <button id="btn-story" class="primary story">▶ Story mode</button>
     <button id="btn-reset" class="ghost">Reset</button>
   </div>
 </header>
 <div id="flash" class="flash"></div>
+<div id="caption" class="caption hidden"><span id="cap-time" class="cap-time"></span><span id="cap-text"></span></div>
 <div id="prompter" class="prompter hidden">
   <div class="prompter-head"><span id="prompter-title">Script</span>
     <span class="prompter-tabs"><button data-script="scam" class="small">Scammer</button><button data-script="real_jihoon" class="small">Real Ji-hoon</button></span>
@@ -163,12 +165,13 @@
 <main class="hub hidden" id="hub">
   <section class="hcard h-cal">
     <div class="h-head"><div class="h-title">📅 Family calendar <span id="hub-cal-title" class="h-sub"></span></div>
-      <div class="h-sub">synced from everyone's AI chats · approved only</div></div>
+      <span class="seg"><button data-calmode="week" class="on">Week</button><button data-calmode="day">Timetable</button></span></div>
     <div id="hub-callbar" class="callbar hidden"></div>
     <div id="hub-calendar" class="hub-calendar"></div>
+    <div id="hub-tt" class="tt hidden"></div>
   </section>
   <section class="hcard h-todo">
-    <div class="h-head"><div class="h-title">✅ 오늘 할 일 <span class="h-sub">My to-dos</span></div><div id="hub-progress" class="hub-progress"></div></div>
+    <div class="h-head"><div class="h-title">✅ 오늘 할 일 <span class="seg"><button data-todomode="todo" class="on">To-dos</button><button data-todomode="chores">집안일</button></span></div><div id="hub-progress" class="hub-progress"></div></div>
     <div id="hub-me" class="hub-me"></div>
     <div id="hub-todos" class="hub-todos"></div>
   </section>

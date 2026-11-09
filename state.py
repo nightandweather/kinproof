@@ -41,6 +41,13 @@ def _seed_events() -> list:
     return [{**e, "id": new_id("e"), "done": False, "confirmed_by": [], "seed": True} for e in evs]
 
 
+def _seed_chores() -> list:
+    path = config.ROOT / "data" / "seed_chores.json"
+    if not path.exists():
+        return []
+    return [{**c, "id": new_id("c"), "done": False} for c in json.loads(path.read_text(encoding="utf-8"))]
+
+
 def fresh() -> dict:
     return {
         "members": {k: {**v, "on_call": False, "share_location": False, "consented": False} for k, v in config.MEMBERS.items()},
@@ -48,6 +55,7 @@ def fresh() -> dict:
         "wiki_highlights": [],
         "approvals": [],
         "events": _seed_events(),
+        "chores": _seed_chores(),
         "notifications": [],
         "ingest_log": [],
         "private_topics": [],   # {id, member, topic, shared} — labels only, never chat content

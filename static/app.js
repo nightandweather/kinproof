@@ -150,9 +150,12 @@ function renderMySched() {
   for (const m of Object.keys(S.members)) {
     const el = $('mysched-' + m);
     if (!el) continue;
-    const evs = S.events.filter((e) => involves(e, m)).sort(sortEv);
+    const all = S.events.filter((e) => involves(e, m)).sort(sortEv);
+    if (m === 'grandma' && (S.call.active || S.call.transcript.length)) { el.html = ''; continue; }   // the call owns the screen
+    const evs = all.slice(0, 3);
+    const more = all.length > 3 ? `<div class="it" style="color:var(--faint)">+${all.length - 3} more this week</div>` : '';
     el.html = evs.length ? `<div class="h">📅 My week</div>` + evs.map((e) =>
-      `<div class="it"><span class="dot bg-${e.owner}"></span><span class="d">${dayLabel(e.date)}</span><span>${evEmoji(e)} ${esc(e.title)}${e.time ? ' · ' + esc(e.time) : ''}</span></div>`).join('') : '';
+      `<div class="it"><span class="dot bg-${e.owner}"></span><span class="d">${dayLabel(e.date)}</span><span>${evEmoji(e)} ${esc(e.title)}${e.time ? ' · ' + esc(e.time) : ''}</span></div>`).join('') + more : '';
   }
 }
 
@@ -317,7 +320,9 @@ $('btn-call').onclick = async () => {
 };
 $('btn-end').onclick = async () => {
   STT.stop(); callListening = false;
-  const name = S && S.call.transcript.length ? prompt('Save this call for replay as (blank = don\'t save):', 'scam') : null;
+  // no prompt(): it is blocked in some embedded browsers. Blocked / impersonated calls save as "scam", others as "real".
+  const c = S && S.call;
+  const name = c && c.transcript.length ? (c.verdict === 'blocked' || (c.claimed && S.members[c.claimed] && !S.members[c.claimed].on_call) ? 'scam' : 'real') : null;
   await api('/call/end', { save_as: name || null });
 };
 $('btn-reset').onclick = async () => {
@@ -379,7 +384,19 @@ if (qp) setTimeout(() => replay(qp), 800);
 
 if (!STT.supported) console.warn('Web Speech not supported: use Chrome');
 // ---------- Family hub (layout from the iPad sketch) ----------
-let view = 'demo', hubMe = 'mom';
+let view = 'demo', hubMe = 'mom', todoMode = 'todo';
+const MEMBER_COLOR = { grandma: '#ff922b', mom: '#f06595', jihoon: '#339af0', dad: '#495057' };
+function renderChores() {
+  const all = S.chores || [];
+  const ids = Object.keys(S.members);
+  const counts = ids.map((m) => [m, all.filter((c) => c.member === m).length]);
+  const total = all.length || 1;
+  const bar = `<div class="share">${counts.map(([m, n]) => `<i style="width:${(n / total) * 100}%;background:${MEMBER_COLOR[m] || '#adb5bd'}"></i>`).join('')}</div>
+    <div class="share-legend">${counts.map(([m, n]) => `<span>${S.members[m].emoji} <b>${n}</b></span>`).join('')}<span style="margin-left:auto">family share this week</span></div>`;
+  const mine = all.filter((c) => c.member === hubMe);
+  $('hub-todos').html = bar + (mine.map((c) => `<div class="todo chore ${c.done ? 'done' : ''}" data-chore="${c.id}"><span class="box">${c.done ? '✓' : ''}</span>
+    <span class="tx">${c.emoji || '🧹'} ${esc(c.title)}</span><span class="days">${esc(c.days)}</span></div>`).join('') || '<div class="empty" style="color:var(--faint)">No chores assigned.</div>');
+}
 const AV_BG = { grandma: '#fff4e6', mom: '#fff0f6', jihoon: '#e7f5ff' };
 
 function myTodos(m) {
@@ -394,7 +411,7 @@ function myTodos(m) {
 
 function renderCallbar() {
   const c = S.call, el = $('hub-callbar');
-  if (!c.active && !c.transcript.length) { el.classList.add('hidden'); return; }
+  if (!c.active) { el.classList.add('hidden'); return; }
   el.classList.remove('hidden');
   el.className = 'callbar ' + c.level;
   const g = S.members.grandma.name_en;
@@ -408,6 +425,7 @@ function renderCallbar() {
 function renderHub() {
   if (view !== 'hub') return;
   renderCallbar();
+  renderTimetable();
   const days = [...Array(7)].map((_, i) => { const d = new Date(WEEK_START); d.setDate(d.getDate() + i); return d; });
   $('hub-cal-title').textContent = `Nov ${days[0].getDate()} – ${days[6].getDate()}, 2026`;
   const c = S.call;
@@ -428,8 +446,10 @@ function renderHub() {
   }).join('');
 
   $('hub-me').html = Object.entries(S.members).map(([m, v]) => `<button data-me="${m}" class="${m === hubMe ? 'on' : ''}">${v.emoji} ${esc(v.name_en)}</button>`).join('');
-  const todos = myTodos(hubMe);
-  $('hub-todos').html = todos.map((t) => `<div class="todo ${t.done ? 'done' : ''}" data-todo="${t.id}"><span class="box">${t.done ? '✓' : ''}</span>
+  document.querySelectorAll('[data-todomode]').forEach((b) => b.classList.toggle('on', b.dataset.todomode === todoMode));
+  if (todoMode === 'chores') { renderChores(); }
+  const todos = todoMode === 'chores' ? (S.chores || []).filter((c) => c.member === hubMe).map((c) => ({ done: c.done })) : myTodos(hubMe);
+  if (todoMode !== 'chores') $('hub-todos').html = todos.map((t) => `<div class="todo ${t.done ? 'done' : ''}" data-todo="${t.id}"><span class="box">${t.done ? '✓' : ''}</span>
     <span class="tx">${esc(t.text)}<span class="when">${esc(t.when)}</span></span></div>`).join('') || '<div class="empty" style="color:var(--faint)">Nothing yet — sync an AI chat.</div>';
 
   $('hub-people').html = Object.entries(S.members).map(([m, v]) => {
@@ -445,7 +465,7 @@ function renderHub() {
   const off = 282.7 * (1 - (total ? done / total : 0));
   $('hub-progress').html = `<div class="ring"><svg viewBox="0 0 104 104"><circle class="track" cx="52" cy="52" r="45"/>
     <circle class="arc" cx="52" cy="52" r="45" style="stroke-dashoffset:${off}"/></svg><div class="num">${done}/${total}</div></div>
-    <div class="prog-tx"><b>${total - done} left</b></div>`;
+    <div class="prog-tx"><b>${total - done} left</b><span>${todoMode === 'chores' ? 'chores' : 'to-dos'}</span></div>`;
 
   $('hub-log').html = S.ingest_log.slice(0, 60).map((l) => {
     const m = l.match(/^(\S+)\s+\[(\w+)\]\s+(.*)$/);
@@ -465,16 +485,19 @@ function setView(v) {
 }
 
 document.addEventListener('click', async (e) => {
-  const b = e.target.closest('[data-view],[data-me],[data-todo],[data-add-member]');
+  const b = e.target.closest('[data-view],[data-me],[data-todo],[data-add-member],[data-todomode],[data-chore]');
   if (!b) return;
   if (b.dataset.view) setView(b.dataset.view);
   if (b.dataset.me) { hubMe = b.dataset.me; render(); }
+  if (b.dataset.todomode) { todoMode = b.dataset.todomode; render(); }
+  if (b.dataset.chore) await api(`/chores/${b.dataset.chore}/done`, {});
   if (b.dataset.addMember) {
-    const name_en = prompt('Name (English), e.g. Dad');
+    const ask = (q, d) => { try { return prompt(q, d); } catch (_) { return d; } };
+    const name_en = ask('Name (English)', 'Uncle');
     if (!name_en) return;
-    const name = prompt('이름 (한국어), e.g. 아빠', '') || name_en;
-    const emoji = prompt('Emoji', '👨‍🦳') || '🙂';
-    const gps = prompt('Location (GPS)', '서울') || '';
+    const name = ask('이름 (한국어)', '삼촌') || name_en;
+    const emoji = ask('Emoji', '🧔') || '🙂';
+    const gps = ask('Location (GPS)', '서울 마포구') || '';
     await api('/members', { name_en, name, emoji, gps });
   }
   if (b.dataset.todo) {
@@ -511,6 +534,7 @@ function renderMap() {
   if (window.L) {
     if (!lmap) {
       lmap = L.map('leaflet', { zoomControl: true, attributionControl: true }).setView([37.45, 127.08], 11);
+      lmap.attributionControl.setPrefix('Leaflet');
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap contributors' }).addTo(lmap);
       setTimeout(() => lmap.invalidateSize(), 50);
     }
@@ -598,5 +622,130 @@ $('btn-med').onclick = async () => {
   };
   next();
 };
+
+// ---------- Story mode: "a day with the Kim family" ----------
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function waitFor(fn, ms = 30000) { const t0 = Date.now(); while (Date.now() - t0 < ms) { try { if (fn()) return true; } catch (_) {} await sleep(300); } return false; }
+function caption(time, text) {
+  const el = $('caption');
+  if (!text) { el.classList.add('hidden'); return; }
+  $('cap-time').textContent = time || ''; $('cap-text').textContent = text;
+  el.classList.remove('hidden'); el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
+}
+let storyRunning = false;
+async function story() {
+  if (storyRunning) return; storyRunning = true;
+  const B = $('btn-story'); B.textContent = '■ Playing…';
+  try {
+    setView('demo');
+    await api('/reset', {}); seenEvents.clear(); seenLines.clear(); lastWikiPageHighlight = 0;
+    caption('', 'Meet the Kims. Grandma, 78, lives alone. Mom is a nurse, Dad a developer, grandson Ji-hoon works in Gangnam.'); await sleep(4200);
+    caption('08:50', 'Each of them installs Kinproof. Protection starts only when everyone agrees.');
+    for (const m of ['grandma', 'mom', 'jihoon', 'dad']) { await sleep(700); await api('/consent', { member: m, share: true, onboarding: true }); }
+    await sleep(1500);
+
+    setView('hub');
+    caption('09:00', "Medicine time. The home robot brings Grandma water and today's blood-pressure pills.");
+    $('btn-med').click(); await sleep(9500);
+
+    setView('demo');
+    caption('09:20', "Mom tells ChatGPT she's taking Grandma to the hospital Thursday. Kinproof syncs the facts — never the chat.");
+    await api('/sync/mom_chatgpt', {});
+    await waitFor(() => S.approvals.some((a) => a.member === 'mom'), 30000); await sleep(1800);
+    caption('09:21', 'Mom approves. Grandma and Ji-hoon each get their reminder. Her job worries stay private.');
+    for (const a of S.approvals.filter((a) => a.member === 'mom')) { await api('/approvals/' + a.id, { decision: 'approve' }); await sleep(350); }
+    await sleep(2200);
+    caption('09:30', "Ji-hoon's Claude chat syncs too: in the Gangnam office all week.");
+    await api('/sync/jihoon_claude', {});
+    await waitFor(() => S.approvals.some((a) => a.member === 'jihoon'), 30000); await sleep(1200);
+    for (const a of S.approvals.filter((a) => a.member === 'jihoon')) { await api('/approvals/' + a.id, { decision: 'approve' }); await sleep(300); }
+    await sleep(1800);
+
+    caption('10:10', 'Grandma just talks. No apps, no menus.');
+    const r = await api('/voice', { member: 'grandma', text: '이번 주 금요일에 뭐 있어?' });
+    if (r.reply) STT.say(r.reply);
+    await sleep(5500);
+
+    caption('11:02', '“Grandma, it\'s me, Ji-hoon. My phone broke…” — a voice that sounds exactly like him.');
+    await api('/presence', { member: 'jihoon', on_call: false });
+    const rec = S.recordings.includes('scam') ? 'scam' : (S.recordings.includes('scam_api') ? 'scam_api' : null);
+    if (rec) {
+      replay(rec);
+      await waitFor(() => S.call.confirm_requested, 40000);
+      caption('11:02', "Ji-hoon's phone isn't on any call. Kinproof asks the real Ji-hoon: “Is this you?”");
+      await waitFor(() => S.call.signals.some((s) => s.type === 'GPS_MISMATCH'), 40000);
+      caption('11:03', 'The caller says Busan. Ji-hoon\'s phone says Gangnam. The family wiki agrees with the phone.');
+      await waitFor(() => S.call.level === 'ALERT', 30000); await sleep(3500);
+      caption('11:03', 'The real Ji-hoon taps “Not me”. Call blocked. Mom and Dad are told why.');
+      await api('/call/confirm', { member: 'jihoon', is_me: false }); await sleep(4500);
+    }
+
+    setView('hub');
+    caption('11:05', 'Home Protector: the whole family on one screen — calendar, to-dos, and a log of every decision the agent made.'); await sleep(6000);
+    caption('19:40', 'Evening. Motion near the back of Grandma\'s yard. The drone checks and Mom gets a photo.');
+    $('btn-motion').click(); await sleep(6500);
+
+    setView('map');
+    caption('21:00', 'Dad, the family admin, can see where everyone is — only because everyone agreed.'); await sleep(5500);
+
+    caption('', "Kinproof. Voice isn't proof anymore — family is."); await sleep(4500);
+  } finally {
+    caption('', ''); storyRunning = false; B.textContent = '▶ Story mode';
+  }
+}
+$('btn-story').onclick = story;
+
+// ---------- timetable: one day, hours down, family members across ----------
+let calMode = 'week', ttDay = '2026-11-09';
+const TT_START = 7, TT_END = 23, HOUR_PX = 38;
+const hhmm = (s) => { const [h, m] = (s || '0:0').split(':').map(Number); return h + m / 60; };
+function renderTimetable() {
+  $('hub-calendar').classList.toggle('hidden', calMode !== 'week');
+  $('hub-tt').classList.toggle('hidden', calMode !== 'day');
+  document.querySelectorAll('[data-calmode]').forEach((b) => b.classList.toggle('on', b.dataset.calmode === calMode));
+  if (calMode !== 'day') return;
+  const ids = Object.keys(S.members);
+  const days = [...Array(7)].map((_, i) => { const d = new Date(WEEK_START); d.setDate(d.getDate() + i); return d; });
+  const dayBtns = days.map((d, i) => { const iso = `2026-11-${String(d.getDate()).padStart(2, '0')}`;
+    return `<button data-ttday="${iso}" class="${iso === ttDay ? 'on' : ''} ${i === 0 ? 'today' : ''}">${DOW[i]} ${d.getDate()}</button>`; }).join('');
+  const top = (h) => (Math.max(TT_START, Math.min(TT_END, h)) - TT_START) * HOUR_PX;
+  const items = S.events.filter((e) => e.date === ttDay);
+  // care moments the agent handled today
+  const c = S.call;
+  if (ttDay === '2026-11-09') {
+    const rob = S.robot || {};
+    if (['taken', 'docked'].includes(rob.stage) && rob.ts) items.push({ title: '💊 혈압약 복용 확인 (robot)', time: '09:00', owner: 'grandma', involves: ['mom'], kind: 'care' });
+    if (c.verdict && c.started) { const d = new Date(c.started * 1000); items.push({ title: c.verdict === 'blocked' ? '🚫 사칭 전화 차단' : '✅ 지훈 통화 확인', time: `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`, owner: 'grandma', involves: c.claimed ? [c.claimed] : [], kind: c.verdict === 'blocked' ? 'incident' : 'care' }); }
+  }
+  const lanes = ids.map((m) => {
+    const evs = items.filter((e) => e.time && involves(e, m)).map((e) => {
+      const y = top(hhmm(e.time)), h = Math.max(30, HOUR_PX * (e.kind ? 0.8 : 1.2));
+      const cls = e.kind || `o-${e.owner}`;
+      return `<div class="tt-ev ${cls} ${e.owner !== m ? 'with' : ''}" style="top:${y}px;height:${h}px"><b>${e.kind ? '' : evEmoji(e) + ' '}${esc(e.title)}</b>${esc(e.time)}</div>`;
+    }).join('');
+    return `<div class="tt-lane" style="height:${(TT_END - TT_START) * HOUR_PX}px">${evs}</div>`;
+  });
+  const axis = [...Array(TT_END - TT_START + 1)].map((_, i) => `<div style="top:${i * HOUR_PX}px">${String(TT_START + i).padStart(2, '0')}:00</div>`).join('');
+  const now = new Date(); const nowH = now.getHours() + now.getMinutes() / 60;
+  const nowLine = ttDay === '2026-11-09' && nowH >= TT_START && nowH <= TT_END ? `<div class="tt-now" style="top:${top(nowH) + 28}px;grid-column:1/-1"></div>` : '';
+  const allday = items.filter((e) => !e.time).map((e) => `${evEmoji(e)} ${esc(e.title)}`).join(' · ');
+  $('hub-tt').html = `<div class="tt-days">${dayBtns}</div>${allday ? `<div class="tt-allday">All day: ${allday}</div>` : ''}
+    <div class="tt-grid" style="--lanes:${ids.length};--hour:${HOUR_PX}px">
+      <div class="tt-head"></div>${ids.map((m) => `<div class="tt-head">${S.members[m].emoji} ${esc(S.members[m].name_en)}</div>`).join('')}
+      <div class="tt-axis" style="height:${(TT_END - TT_START) * HOUR_PX}px">${axis}</div>${lanes.join('')}${nowLine}</div>`;
+  const grid = $('hub-tt').querySelector('.tt-grid');
+  if (grid && grid.dataset.day !== ttDay) {
+    grid.dataset.day = ttDay;
+    const first = Math.min(...items.filter((e) => e.time).map((e) => hhmm(e.time)), 23);
+    grid.scrollTop = Math.max(0, (first - TT_START) * HOUR_PX - 20);
+  }
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-calmode],[data-ttday]');
+  if (!b) return;
+  if (b.dataset.calmode) calMode = b.dataset.calmode;
+  if (b.dataset.ttday) { ttDay = b.dataset.ttday; calMode = 'day'; }
+  render();
+});
 
 poll();

@@ -267,6 +267,18 @@ def robot(body: RobotStep):
     return {"ok": True}
 
 
+@app.post("/api/chores/{cid}/done")
+def chore_done(cid: str):
+    with state.LOCK:
+        for c in state.S["chores"]:
+            if c["id"] == cid:
+                c["done"] = not c["done"]
+                who = config.MEMBERS.get(c["member"], {}).get("name_en", c["member"])
+                state.log(f"{who} {'finished' if c['done'] else 'reopened'} chore: {c['title']}", "chores")
+                return {"ok": True}
+    raise HTTPException(404, cid)
+
+
 @app.post("/api/call/start")
 def call_start(body: CallStart):
     guard.start(body.caller)
