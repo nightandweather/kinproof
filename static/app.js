@@ -729,6 +729,17 @@ function caption(time, text) {
   $('cap-time').textContent = time || ''; $('cap-text').textContent = text;
   el.classList.remove('hidden'); el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
 }
+const PACED = new URLSearchParams(location.search).get('rec') === '1' && new URLSearchParams(location.search).get('auto') !== '1';
+let advance = null;
+document.addEventListener('keydown', (e) => {
+  if (!advance) return;
+  if (['ArrowRight', 'Space', 'Enter', 'PageDown'].includes(e.code)) { e.preventDefault(); const a = advance; advance = null; a(); }
+});
+function beat(ms) {
+  // scene-level pause: presenter presses → / Space to continue (min 600ms so a double press can't skip two scenes)
+  if (!PACED || ms < 1500) return sleep(ms);
+  return sleep(600).then(() => new Promise((r) => { advance = r; }));
+}
 function slide(html) {
   const el = $('slide');
   if (!html) { el.classList.add('hidden'); return; }
@@ -744,38 +755,38 @@ async function story() {
     await api('/reset', {}); seenEvents.clear(); seenLines.clear(); lastWikiPageHighlight = 0;
     caption('', '');
     slide(`<div class="s-logo">K</div><h1>Kinproof</h1><h2>Family security for the age of voice cloning.<br>It checks that a caller is really your family before anyone sends money.</h2>`);
-    await sleep(5500);
+    await beat(5500);
     slide(`<h2>Voice phishing in Korea, 2025</h2><div class="stats">
       <div class="stat"><b>₩1.26T</b><span>lost to voice phishing</span></div>
       <div class="stat"><b>+47%</b><span>vs. the year before</span></div>
       <div class="stat"><b>₩53.8M</b><span>lost per victim</span></div></div>
       <div class="src">Police data via National Assembly analysis</div>`);
-    await sleep(6000);
+    await beat(6000);
     slide(`<h2>Older adults are hit hardest</h2><div class="stats">
       <div class="stat"><b>$7.75B</b><span>lost by people 60+ in the US, 2025</span></div>
       <div class="stat"><b>+59%</b><span>in one year</span></div></div>
       <h2>Phone numbers leak. Voices get cloned.<br>And the parent who lives alone is the easiest target.</h2>
       <div class="src">FBI IC3 2025 Elder Fraud data</div>`);
-    await sleep(6500);
+    await beat(6500);
     slide('');
-    caption('', "This is my family. My mother lives alone. My wife is a nurse. My son is 15. I write code in Pangyo."); await sleep(3800);
+    caption('', "This is my family. My mother lives alone. My wife is a nurse. My son is 15. I write code in Pangyo."); await beat(3800);
     caption('08:50', 'We all install Kinproof. It only turns on when everyone says yes.');
-    for (const m of ['grandma', 'dad', 'mom', 'jihoon']) { await sleep(450); await api('/consent', { member: m, share: true, onboarding: true }); }
-    await sleep(1500);
+    for (const m of ['grandma', 'dad', 'mom', 'jihoon']) { await beat(450); await api('/consent', { member: m, share: true, onboarding: true }); }
+    await beat(1500);
 
     setView('hub'); homeMode = 'in';
     caption('09:00', "9am. The robot brings my mother her blood pressure pills and a glass of water.");
-    $('btn-med').click(); await sleep(6500);
+    $('btn-med').click(); await beat(6500);
     caption('10:40', 'Water on the kitchen floor. The robot warns her, wipes it up, and sends my wife a photo.');
-    $('btn-spill').click(); await sleep(5600);
+    $('btn-spill').click(); await beat(5600);
 
     setView('demo');
     const syncAndShare = async (m, sample, line) => {
       caption(line[0], line[1]);
       await api('/sync/' + sample, {});
-      await waitFor(() => S.approvals.some((a) => a.member === m), 30000); await sleep(900);
-      for (const a of S.approvals.filter((a) => a.member === m)) { await api('/approvals/' + a.id, { decision: 'approve' }); await sleep(200); }
-      await sleep(900);
+      await waitFor(() => S.approvals.some((a) => a.member === m), 30000); await beat(900);
+      for (const a of S.approvals.filter((a) => a.member === m)) { await api('/approvals/' + a.id, { decision: 'approve' }); await beat(200); }
+      await beat(900);
     };
     await syncAndShare('mom', 'mom_chatgpt', ['09:20', "My wife tells ChatGPT about my mother's MRI on Thursday. The date gets shared. Her job stress doesn't."]);
     await syncAndShare('dad', 'dad_chatgpt', ['09:30', "My ChatGPT knows I'm in Pangyo all week. That gets shared. My stock losses don't."]);
@@ -784,7 +795,7 @@ async function story() {
     caption('10:10', "My mother doesn't do apps. She just asks.");
     const r = await api('/voice', { member: 'grandma', text: '이번 주 금요일에 뭐 있어?' });
     if (r.reply) STT.say(r.reply);
-    await sleep(4200);
+    await beat(4200);
 
     caption('11:02', '11am. “Mom, it\'s Jun-ho. My phone broke…”');
     await api('/presence', { member: 'dad', on_call: false });
@@ -809,16 +820,16 @@ async function story() {
     caption('11:03', 'He says he\'s in Busan. My phone is in Pangyo.');
     const lines = (S.scripts || {}).scam || [];
     await waitFor(() => S.call.transcript.length >= lines.length || (S.call.level === 'ALERT' && S.call.transcript.length >= 5), 60000);
-    await sleep(1500);
+    await beat(1500);
     if (!clone) { STT.stop(); callListening = false; prompterOpen = false; $('interim').textContent = ''; }
     caption('11:03', 'I tap Not me. The call is blocked. My wife sees why, and can report it to 112 in one tap.');
-    await api('/call/confirm', { member: 'dad', is_me: false }); await sleep(3800);
+    await api('/call/confirm', { member: 'dad', is_me: false }); await beat(3800);
 
     setView('hub');
-    caption('11:05', 'Everything the family needs, on one screen. Every decision is logged.'); await sleep(4000);
+    caption('11:05', 'Everything the family needs, on one screen. Every decision is logged.'); await beat(4000);
 
 
-    caption('', "Kinproof. A voice isn't proof anymore. Family is."); await sleep(3500);
+    caption('', "Kinproof. A voice isn't proof anymore. Family is."); await beat(3500);
   } finally {
     caption('', ''); slide(''); storyRunning = false; B.textContent = '▶ Story mode';
   }
