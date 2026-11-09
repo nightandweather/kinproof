@@ -22,7 +22,7 @@ const TYPE_LABEL = {
 const WEIGHTS = { FAMILY_CLAIM: 15, AUTHORITY_CLAIM: 25, URGENCY: 15, MONEY_REQUEST: 30, UNUSUAL_PAYMENT: 20,
   SECRECY: 20, CHANNEL_SWITCH: 20, CREDENTIAL_REQUEST: 30, DISTRESS_STORY: 10, CONTEXT_CONTRADICTION: 25, PRESENCE_MISMATCH: 30 };
 const LEVEL_COLOR = { SAFE: 'var(--safe)', CAUTION: 'var(--caution)', ALERT: 'var(--alert)' };
-const NOTE_LABEL = { reminder: 'Family schedule', alert: 'Alert', approval: 'Family wiki', info: 'Verified' };
+const NOTE_LABEL = { reminder: 'Family schedule', alert: 'Alert', approval: 'Family wiki', info: 'Kinproof', photo: 'Home robot' };
 const SRC_BADGE = { chatgpt: 'ChatGPT', claude: 'Claude', voice: 'Voice', local: 'Local AI' };
 const DOW = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const WEEK_START = new Date(2026, 10, 9); // Mon 9 Nov 2026 (demo "today")
@@ -115,7 +115,8 @@ function renderPeople() {
   for (const m of Object.keys(S.members)) {
     const feed = $('feed-' + m);
     if (feed) feed.html = S.notifications.filter((n) => n.member === m && n.kind !== 'confirm_request').slice().reverse()
-      .map((n) => botCard(n.kind, NOTE_LABEL[n.kind] || n.kind, esc(n.text), n.ts)).join('');
+      .map((n) => botCard(n.kind, NOTE_LABEL[n.kind] || n.kind, esc(n.text) + (n.photos ? `<div class="photos">${n.photos.map((src, i) =>
+        `<figure><img src="${src}" alt="${i ? 'after' : 'before'}"><figcaption>${i ? 'After' : 'Before'}</figcaption><span class="cam">simulated cam</span></figure>`).join('')}</div>` : ''), n.ts)).join('');
     const ap = $('approvals-' + m);
     if (ap) ap.html = S.approvals.filter((a) => a.member === m).map((a) => {
       const p = a.payload;
@@ -193,6 +194,7 @@ function renderIdCheck() {
   const row = (st, icon, label, detail) => `<div class="ck ${st}"><span class="ic">${icon}</span>${label}<span class="dt">${detail}</span></div>`;
   const onCall = S.members[m].on_call;
   const rows = [
+    row('neutral', '🎙', `Voice sounds like ${who}`, 'not trusted — clones sound the same'),
     row(onCall ? 'ok' : 'bad', onCall ? '✓' : '✗', `${who}'s phone is on a call`, onCall ? 'yes' : 'no — not calling anyone'),
     c.claimed_location
       ? row(types.has('GPS_MISMATCH') ? 'bad' : 'ok', types.has('GPS_MISMATCH') ? '✗' : '✓', 'Location matches GPS', `says ${esc(c.claimed_location)} · GPS ${esc(S.members[m].gps)}`)
@@ -217,12 +219,20 @@ function renderYard() {
   const [zx, zy] = ZONES[p.zone] || ZONES['front door'];
   const person = p.zone ? `<g><circle class="scan" cx="${zx}" cy="${zy}" r="6" fill="${p.known === false ? '#f03e3e' : '#fab005'}"/>
     <circle cx="${zx}" cy="${zy}" r="6" fill="${p.known === false ? '#f03e3e' : '#fab005'}"/><text x="${zx + 9}" y="${zy + 4}" font-size="10" font-weight="700" fill="#c92a2a">${p.known === false ? 'unknown' : 'someone'}</text></g>` : '';
-  const [rx, ry] = ROBOT_AT[r.stage] || ROBOT_AT.docked;
+  const sp = (S.spill || {}).stage || 'none';
+  const [rx, ry] = ['detect', 'cleaning'].includes(sp) ? [60, 70] : (ROBOT_AT[r.stage] || ROBOT_AT.docked);
   const carry = ['pills', 'deliver', 'taken', 'no_answer'].includes(r.stage) ? '🥤💊' : r.stage === 'water' ? '🥤' : '';
-  const robotSt = { docked: '🤖 Robot charging', start: '🤖 Medicine time — to the kitchen', water: '🤖 Got water', pills: `🤖 Got today's ${r.med}`,
+  const spillSt = { detect: '📸 Water on kitchen floor — fall risk', cleaning: '🧽 Mopping…', done: '✓ Floor dry — photos sent to Mom' }[sp];
+  const robotSt0 = { docked: '🤖 Robot charging', start: '🤖 Medicine time — to the kitchen', water: '🤖 Got water', pills: `🤖 Got today's ${r.med}`,
     deliver: '🤖 Delivered — “약 드셨어요?”', taken: `✓ Grandma took ${r.med}`, no_answer: '⚠ No answer — Mom alerted' }[r.stage] || '';
+  const robotSt = spillSt && sp !== 'done' ? spillSt : robotSt0;
   const doorSt = p.status === 'docked' ? '' : p.status === 'dispatched' ? ' · 🚪 door camera checking…' : p.known ? ' · ✓ family at the door' : ' · ⚠ stranger at the door — Mom alerted';
-  const washing = (S.ingest_log || []).some((l) => l.includes('washer')) ;
+  const washing = (S.ingest_log || []).some((l) => l.includes('washer'));
+  const home = S.home || { bath: {}, lights: {}, speaker: '' };
+  const bath = home.bath || {};
+  const bathLevel = bath.status === 'ready' ? 1 : bath.status === 'filling' ? Math.min(0.95, (Date.now() / 1000 - (bath.since || 0)) / 8) : 0;
+  const ROOM_BOX = { 주방: [6, 6, 130, 80], 작은방1: [136, 6, 96, 80], 안방: [232, 6, 88, 80], 거실: [136, 86, 238, 98], 작은방2: [6, 86, 70, 62] };
+  const lightsOff = Object.entries(ROOM_BOX).filter(([r]) => home.lights && home.lights[r] === false).map(([, [x, y, w, h]]) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#343a40" opacity=".28"/>`).join('');
   $('yard').html = `<svg viewBox="0 0 380 190" preserveAspectRatio="xMidYMid meet" font-family="inherit">
     <rect x="6" y="6" width="368" height="178" rx="10" fill="#f8f9fa" stroke="#868e96" stroke-width="3"/>
     <!-- rooms -->
@@ -230,17 +240,23 @@ function renderYard() {
     <rect x="136" y="6" width="96" height="80" fill="#fff" stroke="#ced4da"/><text x="144" y="22" font-size="10" fill="#868e96">작은방 1</text>
     <rect x="232" y="6" width="142" height="80" fill="#fff" stroke="#ced4da"/><text x="240" y="22" font-size="10" fill="#868e96">안방</text>
     <rect x="320" y="6" width="54" height="42" fill="#e7f5ff" stroke="#ced4da"/><text x="326" y="22" font-size="9" fill="#868e96">욕실</text>
+    <rect x="326" y="28" width="42" height="16" rx="5" fill="#fff" stroke="#74c0fc"/>
+    <rect x="328" y="${44 - bathLevel * 14}" width="38" height="${bathLevel * 14}" rx="3" fill="#74c0fc"><title>bath</title></rect>
+    <text x="330" y="40" font-size="9">${bath.status === 'ready' ? '🛁 ' + bath.temp + '°' : bath.status === 'filling' ? '💧' + bath.temp + '°' : '🛁'}</text>
     <rect x="136" y="86" width="238" height="98" fill="#fff" stroke="#ced4da"/><text x="300" y="104" font-size="10" fill="#868e96">거실</text>
     <rect x="6" y="86" width="70" height="62" fill="#fff" stroke="#ced4da"/><text x="14" y="102" font-size="10" fill="#868e96">작은방 2</text>
     <rect x="76" y="86" width="60" height="44" fill="#e7f5ff" stroke="#ced4da"/><text x="82" y="102" font-size="9" fill="#868e96">욕실</text>
     <rect x="6" y="148" width="80" height="36" fill="#f1f3f5" stroke="#ced4da"/><text x="14" y="163" font-size="10" fill="#868e96">현관 🚪</text>
     <rect x="136" y="184" width="238" height="0" stroke="#74c0fc" stroke-width="6"/><text x="320" y="178" font-size="9" fill="#4dabf7">베란다 ${washing ? '🧺✓' : '🧺'}</text>
     <rect x="200" y="84" width="28" height="12" rx="3" fill="#ffe8cc"/><text x="203" y="94" font-size="8">💊</text>
+    ${lightsOff}
+    ${['detect', 'cleaning'].includes(sp) ? `<ellipse cx="44" cy="72" rx="${sp === 'cleaning' ? 8 : 14}" ry="${sp === 'cleaning' ? 4 : 7}" fill="#74c0fc" opacity=".8"/><text x="22" y="62" font-size="9" font-weight="800" fill="#1c7ed6">💧 wet floor</text>` : ''}
+    <text x="150" y="176" font-size="15">🔊</text>${home.speaker ? `<g><rect x="166" y="158" width="${Math.min(200, home.speaker.length * 7 + 14)}" height="20" rx="8" fill="#191919"/><text x="173" y="172" font-size="9.5" fill="#fff">${esc(home.speaker.slice(0, 26))}${home.speaker.length > 26 ? '…' : ''}</text></g>` : ''}
     <!-- grandma on sofa -->
     <rect x="252" y="140" width="56" height="14" rx="4" fill="#ffd8a8"/><text x="268" y="138" font-size="20">👵</text>
     <g class="robot" style="transform:translate(${rx - 176}px,${ry - 150}px)"><text x="166" y="158" font-size="18">🤖</text><text x="184" y="146" font-size="10">${carry}</text></g>
     ${person}
-  </svg><div class="yard-status">${robotSt}${doorSt}</div>`;
+  </svg><div class="yard-status">${robotSt}${doorSt}${bath.status === 'filling' ? ' · 🛁 filling…' : ''}</div>`;
 }
 
 function renderWiki() {
@@ -653,6 +669,8 @@ async function story() {
     setView('hub');
     caption('09:00', "Medicine time. The home robot brings Grandma water and today's blood-pressure pills.");
     $('btn-med').click(); await sleep(9500);
+    caption('10:40', 'The robot spots water on the kitchen floor — a slip-and-fall risk for an older adult. It warns Grandma, mops it up, and sends Mom before/after photos.');
+    $('btn-spill').click(); await sleep(7000);
 
     setView('demo');
     caption('09:20', "Mom tells ChatGPT she's taking Grandma to the hospital Thursday. Kinproof syncs the facts — never the chat.");
@@ -766,5 +784,22 @@ $('btn-laundry').onclick = () => api('/laundry', {});
   if (el) el.classList.add('me');
   document.querySelectorAll('[data-as]').forEach((a) => a.classList.toggle('on', a.dataset.as === as));
 })();
+
+async function sendAsk(m) {
+  const input = $('ask-' + m), btn = document.querySelector(`[data-ask="${m}"]`);
+  const text = input.value.trim();
+  if (!text) return;
+  btn.disabled = true; btn.textContent = '…';
+  try { await api('/home', { member: m, text }); input.value = ''; } finally { btn.disabled = false; btn.textContent = '보내기'; }
+}
+document.addEventListener('click', (e) => { const b = e.target.closest('[data-ask]'); if (b) sendAsk(b.dataset.ask); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.id && e.target.id.startsWith('ask-') && !e.isComposing) sendAsk(e.target.id.slice(4)); });
+
+$('btn-spill').onclick = async () => {
+  await api('/spill', { stage: 'detect' });
+  setTimeout(() => api('/spill', { stage: 'cleaning' }), 2600);
+  setTimeout(() => api('/spill', { stage: 'done' }), 5600);
+  setTimeout(() => api('/spill', { stage: 'none' }), 9000);
+};
 
 poll();

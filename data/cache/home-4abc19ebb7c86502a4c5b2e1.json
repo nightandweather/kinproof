@@ -1,0 +1,12 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "device": "refuse",
+  "room": null,
+  "item": null,
+  "say": null,
+  "temp": null,
+  "on": null,
+  "reply": "할머니께 45도 목욕물은 화상 위험이 있어 받아드릴 수 없어요."
+ }
+}

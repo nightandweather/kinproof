@@ -1,0 +1,12 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "device": "speaker",
+  "room": null,
+  "item": null,
+  "say": "할머니, 저녁 7시에 데리러 갈게요.",
+  "temp": null,
+  "on": null,
+  "reply": "할머니께 저녁 7시에 데리러 간다고 전해드릴게요."
+ }
+}

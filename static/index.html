@@ -94,7 +94,7 @@
       <div id="private-mom" class="private"></div>
       <div id="feed-mom" class="feed"></div>
     </div>
-    <div class="composer"><button class="sync" data-sync="mom_chatgpt">↻ Sync ChatGPT</button></div>
+    <div class="composer stack"><div class="homeask"><input id="ask-mom" placeholder="🏠 할머니 댁에 부탁하기… (예: 목욕물 받아줘)"><button data-ask="mom">보내기</button></div><button class="sync" data-sync="mom_chatgpt">↻ Sync ChatGPT</button></div>
     <div class="onboard" id="onboard-mom">
       <div class="ob-logo">K</div>
       <div class="ob-title">Kinproof</div>
@@ -118,7 +118,7 @@
       <div id="private-jihoon" class="private"></div>
       <div id="feed-jihoon" class="feed"></div>
     </div>
-    <div class="composer"><button class="sync" data-sync="jihoon_claude">↻ Sync Claude</button></div>
+    <div class="composer stack"><div class="homeask"><input id="ask-jihoon" placeholder="🏠 할머니 댁에 부탁하기… (예: 목욕물 받아줘)"><button data-ask="jihoon">보내기</button></div><button class="sync" data-sync="jihoon_claude">↻ Sync Claude</button></div>
     <div id="confirm-box" class="confirm hidden">
       <div class="bypass">🔕 Do Not Disturb bypassed · emergency family check</div>
       <div class="confirm-icon">⚠️</div>
@@ -150,7 +150,7 @@
       <div id="topics-dad" class="topics"></div>
       <div id="feed-dad" class="feed"></div>
     </div>
-    <div class="composer"><button class="sync" data-view="map">🗺 Family map</button><button class="sync alt" data-view="hub">🏠 Home</button></div>
+    <div class="composer stack"><div class="homeask"><input id="ask-dad" placeholder="🏠 할머니 댁에 부탁하기… (예: 목욕물 받아줘)"><button data-ask="dad">보내기</button></div><div style="display:flex;gap:8px"><button class="sync" data-view="map">🗺 Family map</button><button class="sync alt" data-view="hub">🏠 Home</button></div></div>
     <div class="onboard" id="onboard-dad">
       <div class="ob-logo">K</div>
       <div class="ob-title">Kinproof</div>
@@ -185,7 +185,7 @@
   </section>
   <section class="hcard h-yard">
     <div class="h-head"><div class="h-title">🏠 Grandma's home <span class="h-sub">34평 아파트</span> <span class="sim">SIMULATED</span></div>
-      <span><button id="btn-med" class="small">💊 Medicine</button> <button id="btn-laundry" class="small">🧺 Washer done</button> <button id="btn-motion" class="small">🚪 At the door</button></span></div>
+      <span><button id="btn-med" class="small">💊 Medicine</button> <button id="btn-spill" class="small">💧 Spill</button> <button id="btn-laundry" class="small">🧺 Washer</button> <button id="btn-motion" class="small">🚪 Door</button></span></div>
     <div id="yard" class="yard"></div>
   </section>
   <section class="hcard h-log">

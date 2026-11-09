@@ -1,0 +1,12 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "device": "bath",
+  "room": null,
+  "item": null,
+  "say": null,
+  "temp": 45,
+  "on": null,
+  "reply": "할머니 목욕물은 안전한 온도로 제한해서 받아드릴게요."
+ }
+}

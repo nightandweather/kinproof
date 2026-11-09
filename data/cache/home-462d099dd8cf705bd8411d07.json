@@ -1,0 +1,12 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "device": "lights",
+  "room": "거실",
+  "item": null,
+  "say": null,
+  "temp": null,
+  "on": false,
+  "reply": "거실 불을 껐어요."
+ }
+}

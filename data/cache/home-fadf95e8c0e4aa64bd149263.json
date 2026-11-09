@@ -1,0 +1,12 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "device": "refuse",
+  "room": null,
+  "item": null,
+  "say": null,
+  "temp": null,
+  "on": null,
+  "reply": "죄송하지만 현관문을 대신 열어드릴 수는 없어요."
+ }
+}

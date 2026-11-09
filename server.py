@@ -12,6 +12,7 @@ from pydantic import BaseModel
 
 import config
 import guard
+import home
 import ingest
 import state
 
@@ -82,6 +83,15 @@ class VoiceIn(BaseModel):
 class RobotStep(BaseModel):
     stage: str          # start | water | pills | deliver | taken | no_answer | docked
     med: str = "혈압약"
+
+
+class HomeCmd(BaseModel):
+    member: str
+    text: str
+
+
+class Spill(BaseModel):
+    stage: str   # detect | cleaning | done | none
 
 
 class CallEnd(BaseModel):
@@ -289,6 +299,30 @@ def laundry():
     who = chore["member"] if chore else config.CAREGIVER
     state.log(f"washer (베란다) finished → nudged {who} for '{chore['title'] if chore else 'laundry'}'", "home")
     state.notify(who, "reminder", "🧺 세탁 끝났어요! 건조대에 널어 주세요. (오늘 집안일 담당)")
+    return {"ok": True}
+
+
+@app.post("/api/home")
+def home_command(body: HomeCmd):
+    _member(body.member)
+    return home.command(body.member, body.text)
+
+
+@app.post("/api/spill")
+def spill(body: Spill):
+    """SIMULATED robot patrol: water on the floor is a fall risk for an older adult. Photo before and after."""
+    g = config.MEMBERS[config.PROTECTED]["name"]
+    with state.LOCK:
+        state.S["spill"]["stage"] = body.stage
+    if body.stage == "detect":
+        state.log("robot camera: water on the kitchen floor in front of the sink → fall risk, photo saved", "robot")
+        state.notify(config.PROTECTED, "info", "🔊 홈스피커: 주방 바닥에 물이 있어요. 미끄러우니 조심하세요. 제가 닦을게요.")
+    elif body.stage == "cleaning":
+        state.log("robot: mopping the spill (kitchen)", "robot")
+    elif body.stage == "done":
+        state.log("robot: floor dry → after-photo saved, caregiver notified", "robot")
+        state.notify(config.CAREGIVER, "photo", f"🤖 {g} 댁 주방 바닥 물기를 발견해서 닦았어요. 낙상 위험 해결 ✓",
+                     photos=["/static/img/spill_before.jpg", "/static/img/spill_after.jpg"])
     return {"ok": True}
 
 

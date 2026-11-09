@@ -62,6 +62,9 @@ def fresh() -> dict:
         "call": _empty_call(),
         "perimeter": {"zone": None, "status": "docked", "ts": "", "known": None},
         "robot": {"stage": "docked", "med": "혈압약", "ts": ""},
+        "spill": {"stage": "none", "room": "주방"},
+        "home": {"bath": {"status": "idle", "temp": None}, "speaker": "",
+                 "lights": {"거실": True, "주방": True, "안방": False, "작은방1": False, "작은방2": False, "욕실": False}},
         "mode": config.LLM_MODE,
     }
 

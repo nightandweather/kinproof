@@ -1,0 +1,12 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "device": "robot",
+  "room": null,
+  "item": "물 한 잔",
+  "say": null,
+  "temp": null,
+  "on": null,
+  "reply": "할머니께 물 한 잔 갖다 드릴게요."
+ }
+}
