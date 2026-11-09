@@ -482,6 +482,7 @@ function renderHub() {
 function setView(v) {
   view = v;
   document.querySelectorAll('[data-view]').forEach((b) => b.classList.toggle('on', b.dataset.view === v));
+  document.querySelector('.stage').scrollTop = 0;
   document.querySelector('.stage').classList.toggle('hidden', v !== 'demo');
   $('hub').classList.toggle('hidden', v !== 'hub');
   $('mapview').classList.toggle('hidden', v !== 'map');
