@@ -58,6 +58,12 @@ presenter's own voice) into a replay: timing from the audio, sentence text align
 | Family-scale context fits in one prompt | The whole wiki goes into the prompt — no vector DB, fully inspectable |
 | Demo survives bad Wi-Fi | `KP_LLM_MODE=record` caches real responses; `replay` re-runs them on the same code path |
 
+**Why not an autonomous agent?** Blocking a call or a transfer is a safety decision, so no agent loop gets to make it.
+Each model call is a single, schema-constrained extraction (claims + verbatim quotes); verification, scoring and the
+verdict are deterministic code. *AI gathers the evidence. Verifiable code makes the call. A hallucination can't move
+Grandma's money.* Next: a proactive family agent that reads the shared calendar and reaches out first (e.g. reminds Mom
+about Grandma's clinic visit and sorts out who drives) — acting only on low-stakes coordination, never on money.
+
 ## Architecture
 
 ```
