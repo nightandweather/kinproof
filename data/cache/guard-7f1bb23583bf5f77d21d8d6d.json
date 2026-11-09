@@ -1,0 +1,15 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "claimed_identity": "jihoon",
+  "signals": [
+   {
+    "type": "SECRECY",
+    "quote": "엄마한테는 절대 말하지 마",
+    "quote_en": "Don't tell Mom under any circumstances.",
+    "wiki_page": null,
+    "wiki_quote": null
+   }
+  ]
+ }
+}

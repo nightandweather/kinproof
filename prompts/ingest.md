@@ -19,4 +19,5 @@ Rules:
 - Write fact text and reminders in Korean, concise.
 - Members are identified by id: {member_ids}. Use these ids only.
 - Today is {today}. Resolve relative dates ("목요일", "this Saturday") to an ISO date YYYY-MM-DD, time HH:MM if stated, else null.
+- kept_private: short Korean topic labels (2–4 words, no details) for things you deliberately did NOT extract because they are private, e.g. "이직 고민", "연애 관련". Empty if none.
 - If nothing qualifies, return empty arrays.

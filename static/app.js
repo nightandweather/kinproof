@@ -18,7 +18,25 @@ const WEIGHTS = { FAMILY_CLAIM: 15, AUTHORITY_CLAIM: 25, URGENCY: 15, MONEY_REQU
   SECRECY: 20, CHANNEL_SWITCH: 20, CREDENTIAL_REQUEST: 30, DISTRESS_STORY: 10, CONTEXT_CONTRADICTION: 25, PRESENCE_MISMATCH: 30 };
 const LEVEL_COLOR = { SAFE: 'var(--safe)', CAUTION: 'var(--caution)', ALERT: 'var(--alert)' };
 
-let S = null, wikiPage = 'jihoon', lastWikiPageHighlight = 0;
+let S = null, wikiPage = 'jihoon', lastWikiPageHighlight = 0, lastVerdict = null;
+
+function renderSteps() {
+  const c = S.call;
+  const synced = S.ingest_log.some((l) => l.includes('synced'));
+  const approved = S.events.length > 0 || S.ingest_log.some((l) => l.includes('wiki/'));
+  const calling = c.active || c.transcript.length > 0;
+  const confirmed = !!c.verdict;
+  const state = { 1: synced, 2: approved, 3: calling && (c.level !== 'SAFE' || confirmed), 4: confirmed };
+  const active = !synced ? 1 : !approved ? 2 : !confirmed ? 3 : 4;
+  document.querySelectorAll('.step').forEach((el) => {
+    const n = +el.dataset.step;
+    el.className = 'step' + (state[n] ? ' done' : n === active ? ' active' : '');
+  });
+  if (c.verdict !== lastVerdict) {
+    if (c.verdict === 'blocked') { const f = $('flash'); f.classList.remove('on'); void f.offsetWidth; f.classList.add('on'); }
+    lastVerdict = c.verdict;
+  }
+}
 
 // ---------- utterance queue: keep order, one at a time ----------
 const queue = [];
@@ -36,6 +54,7 @@ async function sendUtterance(text) {
 function render() {
   if (!S) return;
   const c = S.call;
+  renderSteps();
   $('mode').textContent = S.mode.toUpperCase();
   $('mode').className = 'badge' + (S.mode === 'replay' ? ' replay' : '');
 

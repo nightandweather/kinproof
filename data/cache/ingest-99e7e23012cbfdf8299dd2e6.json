@@ -1,0 +1,40 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "facts": [
+   {
+    "about": "jihoon",
+    "text": "지훈은 이번 주 월요일부터 금요일까지 판교 사무실에 출근한다.",
+    "source_quote": "월요일부터 금요일까지 판교 사무실 출근이고"
+   },
+   {
+    "about": "grandma",
+    "text": "할머니는 무릎이 좋지 않다.",
+    "source_quote": "할머니 무릎 안 좋으시니까"
+   }
+  ],
+  "events": [
+   {
+    "title": "지훈의 할머니 댁 방문",
+    "date": "2026-11-14",
+    "time": null,
+    "owner": "jihoon",
+    "involves": [
+     "jihoon",
+     "grandma"
+    ],
+    "notify": [
+     {
+      "member": "grandma",
+      "message": "할머니, 이번 토요일 오후에 지훈이가 댁에 방문하기로 했어요."
+     },
+     {
+      "member": "mom",
+      "message": "엄마, 지훈이가 이번 토요일 오후에 할머니 댁에 가기로 했어요."
+     }
+    ],
+    "source_quote": "토요일 오후엔 할머니 댁 가기로 했어."
+   }
+  ]
+ }
+}

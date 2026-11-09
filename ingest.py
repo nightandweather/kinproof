@@ -16,8 +16,9 @@ MEMBER_IDS = list(config.MEMBERS)
 SCHEMA = {
     "type": "object",
     "additionalProperties": False,
-    "required": ["facts", "events"],
+    "required": ["facts", "events", "kept_private"],
     "properties": {
+        "kept_private": {"type": "array", "items": {"type": "string"}},
         "facts": {"type": "array", "items": {
             "type": "object", "additionalProperties": False,
             "required": ["about", "text", "source_quote"],
@@ -82,9 +83,20 @@ def process_text(member: str, source: str, body: str, filename: str) -> int:
             created += 1
     if created:
         state.notify(member, "approval", f"AI 대화에서 {created}개 항목을 찾았어요. 가족 위키에 올릴까요?")
-    state.log(f"{filename}: {created} proposed, {dropped} dropped (quote not in source), "
-              f"private content not extracted")
+    kept = out.get("kept_private", [])
+    state.log(f"{filename}: {created} proposed, {dropped} dropped (quote not in source)"
+              + (f" · kept private: {', '.join(kept)}" if kept else ""))
     return created
+
+
+def _duplicate_of(p: dict) -> dict | None:
+    """Same date and time, overlapping people -> the same real-world event from another chat."""
+    for ev in state.S["events"]:
+        same_when = ev["date"] == p["date"] and (ev["time"] or "") == (p["time"] or "")
+        people = set(ev["involves"]) | {ev["owner"]}
+        if same_when and people & (set(p["involves"]) | {p["owner"]}):
+            return ev
+    return None
 
 
 def process_file(path) -> None:
@@ -118,9 +130,12 @@ def approve(approval_id: str, decision: str) -> bool:
             state.S["wiki"].setdefault(page, f"# {page}\n")
             state.S["wiki"][page] = state.S["wiki"][page].rstrip() + "\n" + line + "\n"
             state.log(f"wiki/{page}.md += {p['text']}")
+        elif (dup := _duplicate_of(p)) is not None:
+            dup.setdefault("confirmed_by", []).append(who)
+            state.log(f"event already on schedule: {dup['title']} — also confirmed by {who}")
         else:
             ev = {"id": state.new_id("e"), "title": p["title"], "date": p["date"], "time": p["time"],
-                  "owner": p["owner"], "involves": p["involves"], "done": False}
+                  "owner": p["owner"], "involves": p["involves"], "done": False, "confirmed_by": [who]}
             state.S["events"].append(ev)
             for n in p["notify"]:
                 if n["member"] != item["member"]:

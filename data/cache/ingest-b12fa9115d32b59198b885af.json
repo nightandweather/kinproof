@@ -1,0 +1,53 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "kept_private": [
+   "이직 고민"
+  ],
+  "facts": [],
+  "events": [
+   {
+    "title": "서울아산병원 정형외과 무릎 MRI 결과 상담",
+    "date": "2026-11-12",
+    "time": "14:00",
+    "owner": "mom",
+    "involves": [
+     "grandma",
+     "mom"
+    ],
+    "notify": [
+     {
+      "member": "grandma",
+      "message": "할머니, 목요일 오후 2시에 엄마와 서울아산병원 정형외과에서 무릎 MRI 결과를 들으세요."
+     },
+     {
+      "member": "jihoon",
+      "message": "지훈아, 목요일 오후 2시에 할머니가 엄마와 서울아산병원 정형외과에서 무릎 MRI 결과를 들으셔."
+     }
+    ],
+    "source_quote": "목요일 오후 2시에 엄마 모시고 서울아산병원 정형외과 가야 돼. 무릎 MRI 결과 듣는 날이야."
+   },
+   {
+    "title": "지훈의 할머니 댁 방문",
+    "date": "2026-11-14",
+    "time": null,
+    "owner": "jihoon",
+    "involves": [
+     "grandma",
+     "jihoon"
+    ],
+    "notify": [
+     {
+      "member": "grandma",
+      "message": "할머니, 토요일에 지훈이가 댁에 들르기로 했어요."
+     },
+     {
+      "member": "jihoon",
+      "message": "지훈아, 토요일에 할머니 댁에 들르기로 했어."
+     }
+    ],
+    "source_quote": "토요일에는 지훈이가 엄마 댁에 들르기로 했어."
+   }
+  ]
+ }
+}

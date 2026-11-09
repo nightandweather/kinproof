@@ -1,0 +1,15 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "claimed_identity": "jihoon",
+  "signals": [
+   {
+    "type": "FAMILY_CLAIM",
+    "quote": "할머니, 저 지훈이에요.",
+    "quote_en": "Grandma, it's me, Jihoon.",
+    "wiki_page": null,
+    "wiki_quote": null
+   }
+  ]
+ }
+}
