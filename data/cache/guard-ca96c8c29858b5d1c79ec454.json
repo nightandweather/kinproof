@@ -1,0 +1,16 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "claimed_location": null,
+  "claimed_identity": "jihoon",
+  "signals": [
+   {
+    "type": "FAMILY_CLAIM",
+    "quote": "나야, 지훈이.",
+    "quote_en": "It’s me, Jihoon.",
+    "wiki_page": null,
+    "wiki_quote": null
+   }
+  ]
+ }
+}

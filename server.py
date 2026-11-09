@@ -94,6 +94,15 @@ class Spill(BaseModel):
     stage: str   # detect | cleaning | done | none
 
 
+class DroneEvent(BaseModel):
+    event: str   # patrol | stranger | wander | home
+
+
+class Report(BaseModel):
+    member: str
+    kind: str     # scam | wander
+
+
 class CallEnd(BaseModel):
     save_as: str | None = None
 
@@ -323,6 +332,52 @@ def spill(body: Spill):
         state.log("robot: floor dry → after-photo saved, caregiver notified", "robot")
         state.notify(config.CAREGIVER, "photo", f"🤖 {g} 댁 주방 바닥 물기를 발견해서 닦았어요. 낙상 위험 해결 ✓",
                      photos=["/static/img/spill_before.jpg", "/static/img/spill_after.jpg"])
+    return {"ok": True}
+
+
+@app.post("/api/drone")
+def drone(body: DroneEvent):
+    """SIMULATED complex-patrol drone outside Grandma's apartment building."""
+    g = config.MEMBERS[config.PROTECTED]["name"]
+    admin = getattr(config, "ADMIN", config.CAREGIVER)
+    with state.LOCK:
+        state.S["drone"].update(event=body.event, ts=state.now())
+    if body.event == "stranger":
+        state.log("drone patrol: person loitering at 101동 entrance for 5+ min, checking mailboxes → snapshot", "drone")
+        for who in {config.CAREGIVER, admin}:
+            state.notify(who, "alert", f"🚁 {g} 댁 101동 출입구 앞에 모르는 사람이 5분 넘게 서성여요. 드론 사진을 보냈어요.")
+        state.notify(config.PROTECTED, "info", "🔊 홈스피커: 1층 출입구에 낯선 사람이 있어요. 지금은 나가지 마세요.")
+    elif body.event == "wander":
+        state.log(f"drone: {g} left the building alone at 23:40 → following at a distance, live location to family", "drone")
+        for who in {config.CAREGIVER, admin, "jihoon"}:
+            state.notify(who, "alert", f"🚁 할머니가 밤 11시 40분에 혼자 단지 밖으로 나가셨어요. 드론이 따라가며 위치를 보내고 있어요: 단지 정문 → 버스정류장 방향.")
+    elif body.event == "home":
+        state.log(f"drone: {g} back inside 101동 → family notified, drone returns to patrol", "drone")
+        state.notify(config.CAREGIVER, "info", f"🏠 {g} 무사히 귀가하셨어요. (드론 확인)")
+    return {"ok": True}
+
+
+@app.post("/api/report")
+def report(body: Report):
+    """A family member confirms a 112 report. Never automatic. SIMULATED: no call is placed."""
+    _member(body.member)
+    who = config.MEMBERS[body.member]["name_en"]
+    with state.LOCK:
+        if any(r["kind"] == body.kind for r in state.S["reports"]):
+            return {"ok": True, "duplicate": True}
+        c = state.S["call"]
+        if body.kind == "scam":
+            pack = {"caller": c["caller"], "time": state.now(), "quotes": [s["quote"] for s in c["signals"] if s.get("by") != "code"],
+                    "reasons": (c.get("explain") or [""])[0]}
+            summary = f"caller {c['caller']}, {len(pack['quotes'])} quotes, verdict {c['verdict']}"
+        else:
+            pack = {"time": state.now(), "last_seen": "단지 정문 → 버스정류장 방향 (drone)"}
+            summary = "missing-person request with drone live location"
+        state.S["reports"].append({"kind": body.kind, "by": body.member, "ts": state.now(), "pack": pack})
+    state.log(f"{who} confirmed 112 report ({body.kind}): {summary} — SIMULATED, nothing dialed", "report")
+    for m in config.MEMBERS:
+        if m != config.PROTECTED:
+            state.notify(m, "info", f"🚨 {config.MEMBERS[body.member]['name']}가 112에 신고했어요 ({'보이스피싱' if body.kind == 'scam' else '실종 우려'}). 증거 묶음 전송 완료 (데모: 실제 발신 없음)")
     return {"ok": True}
 
 

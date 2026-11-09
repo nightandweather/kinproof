@@ -28,6 +28,7 @@ const DOW = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const WEEK_START = new Date(2026, 10, 9); // Mon 9 Nov 2026 (demo "today")
 
 let calWho = 'all', script = 'scam', prompterOpen = false, prompterBase = 0;
+const dismissed = new Set();
 let S = null, wikiPage = 'jihoon', lastWikiPageHighlight = 0, lastVerdict;
 const seenEvents = new Set(), newEvents = new Set(), seenLines = new Set(), newLines = new Set();
 
@@ -129,6 +130,22 @@ function renderPeople() {
       return botCard('ask', a.kind === 'fact' ? 'Share this fact?' : 'Add to family schedule?', body, '', btns);
     }).join('');
   }
+  // one-tap 112 report offer (family confirms; never automatic)
+  const reported = (k) => (S.reports || []).some((r) => r.kind === k);
+  const offers = [];
+  if (S.call.verdict === 'blocked' && !reported('scam')) {
+    const q = S.call.signals.filter((s) => s.by !== 'code').length;
+    offers.push(botCard('report', '🚨 Report to 112?', `<b>Voice-phishing evidence pack ready</b><div class="pack">📞 ${esc(S.call.caller)} · 🕐 ${esc(S.call.transcript.length ? 'today' : '')} · 💬 ${q} verified quotes · 🧠 reasons attached</div>`, '',
+      `<div class="card-btns"><button class="r112" data-report="scam">Report to 112</button><button data-dismiss="scam">Not now</button></div>`));
+  }
+  if ((S.drone || {}).event === 'wander' && !reported('wander')) {
+    offers.push(botCard('report', '🚨 Grandma out alone at night', `<b>Ask 112 for help finding her?</b><div class="pack">📍 drone live location attached</div>`, '',
+      `<div class="card-btns"><button class="r112" data-report="wander">Request 112</button><button data-dismiss="wander">She's OK</button></div>`));
+  }
+  for (const m of ['mom', 'dad']) {
+    const el = $('offers-' + m);
+    if (el) el.html = dismissed.has(S.call.caller + m) ? '' : offers.join('');
+  }
   const room = $('feed-mom')?.closest('.room');
   document.querySelectorAll('.room').forEach((r) => { if (r._n !== r.scrollHeight) { r._n = r.scrollHeight; } });
 
@@ -213,8 +230,39 @@ let yardTimer = null, robotTimer = null;
 // 34평 (84㎡) 3-room apartment, viewBox 380x190
 const ZONES = { 'front door': [48, 168] };
 const ROBOT_AT = { docked: [176, 150], start: [176, 150], water: [96, 62], pills: [214, 92], deliver: [268, 132], taken: [268, 132], no_answer: [268, 132] };
+let homeMode = 'in';
+function renderOutside() {
+  const d = S.drone || { event: 'patrol' };
+  const ev = d.event;
+  // drone flies a patrol loop; on an event it hovers over the target
+  const target = ev === 'stranger' ? [96, 120] : ev === 'wander' ? [318, 52] : null;
+  const droneEl = target
+    ? `<g transform="translate(${target[0] - 10},${target[1] - 34})"><text font-size="18">🚁</text></g><circle class="scan" cx="${target[0]}" cy="${target[1]}" r="8" fill="${ev === 'stranger' ? '#f03e3e' : '#fab005'}"/>`
+    : `<text font-size="18">🚁<animateMotion dur="9s" repeatCount="indefinite" path="M60,40 L330,40 L330,165 L60,165 Z"/></text>`;
+  const person = ev === 'stranger' ? `<text x="88" y="128" font-size="15">🕵</text><text x="106" y="140" font-size="9.5" font-weight="800" fill="#c92a2a">loitering 5 min</text>`
+    : ev === 'wander' ? `<text x="310" y="60" font-size="15">👵</text><path d="M120 118 Q 200 110 310 56" stroke="#fab005" stroke-width="2" stroke-dasharray="4 4" fill="none"/><text x="230" y="80" font-size="9.5" font-weight="800" fill="#e67700">23:40 alone → bus stop</text>`
+    : ev === 'home' ? `<text x="112" y="118" font-size="13">👵✓</text>` : '';
+  const st = { patrol: '🚁 Patrolling the complex', stranger: '⚠ Stranger at 101동 entrance — photo sent to Mom & Dad', wander: '⚠ Grandma out alone at night — drone following, family has live location', home: '✓ Grandma back home' }[ev] || '';
+  $('yard').html = `<svg viewBox="0 0 380 190" preserveAspectRatio="xMidYMid meet" font-family="inherit">
+    <rect x="6" y="6" width="368" height="178" rx="12" fill="#e9f5e1" stroke="#8ce99a" stroke-width="2"/>
+    <rect x="6" y="176" width="368" height="8" fill="#ced4da"/><text x="300" y="172" font-size="9" fill="#868e96">road · 정문</text>
+    <rect x="70" y="70" width="70" height="44" rx="4" fill="#fff" stroke="#adb5bd" stroke-width="2"/><text x="84" y="96" font-size="11" font-weight="800">101동 👵</text>
+    <rect x="160" y="70" width="70" height="44" rx="4" fill="#fff" stroke="#dee2e6"/><text x="178" y="96" font-size="10" fill="#868e96">102동</text>
+    <rect x="250" y="100" width="70" height="44" rx="4" fill="#fff" stroke="#dee2e6"/><text x="268" y="126" font-size="10" fill="#868e96">103동</text>
+    <rect x="86" y="114" width="24" height="8" fill="#ffd8a8"/><text x="70" y="134" font-size="8.5" fill="#868e96">entrance</text>
+    <rect x="160" y="130" width="70" height="30" rx="4" fill="#f1f3f5"/><text x="172" y="149" font-size="9" fill="#868e96">🅿 parking</text>
+    <circle cx="44" cy="40" r="16" fill="#b2f2bb"/><text x="30" y="66" font-size="8.5" fill="#868e96">playground</text>
+    <rect x="300" y="30" width="56" height="14" rx="4" fill="#fff3bf"/><text x="304" y="40" font-size="8.5" fill="#868e96">🚏 bus stop</text>
+    ${person}${droneEl}
+  </svg><div class="yard-status">${st}</div>`;
+}
+
 function renderYard() {
   if (view !== 'hub') return;
+  document.querySelectorAll('[data-homemode]').forEach((b) => b.classList.toggle('on', b.dataset.homemode === homeMode));
+  $('home-in-btns').classList.toggle('hidden', homeMode !== 'in');
+  $('home-out-btns').classList.toggle('hidden', homeMode !== 'out');
+  if (homeMode === 'out') { renderOutside(); return; }
   const p = S.perimeter || {}, r = S.robot || { stage: 'docked' };
   const [zx, zy] = ZONES[p.zone] || ZONES['front door'];
   const person = p.zone ? `<g><circle class="scan" cx="${zx}" cy="${zy}" r="6" fill="${p.known === false ? '#f03e3e' : '#fab005'}"/>
@@ -709,8 +757,10 @@ async function story() {
 
     setView('hub');
     caption('11:05', 'Home Protector: the whole family on one screen — calendar, to-dos, and a log of every decision the agent made.'); await sleep(6000);
-    caption('19:40', 'Evening. A stranger lingers at Grandma\'s front door. The door camera checks, Grandma is told not to open, Mom gets a photo.');
-    $('btn-motion').click(); await sleep(6500);
+    homeMode = 'out'; render();
+    caption('23:40', 'Late at night Grandma walks out of the building alone. The patrol drone follows at a distance and the family gets her live location — until she is safely home.');
+    $('btn-wander').click(); await sleep(8500);
+    homeMode = 'in';
 
     setView('map');
     caption('21:00', 'Dad, the family admin, can see where everyone is — only because everyone agreed.'); await sleep(5500);
@@ -804,5 +854,17 @@ $('btn-spill').onclick = async () => {
   setTimeout(() => api('/spill', { stage: 'done' }), 5600);
   setTimeout(() => api('/spill', { stage: 'none' }), 9000);
 };
+
+document.addEventListener('click', (e) => { const b = e.target.closest('[data-homemode]'); if (b) { homeMode = b.dataset.homemode; render(); } });
+$('btn-stranger').onclick = async () => { await api('/drone', { event: 'stranger' }); setTimeout(() => api('/drone', { event: 'patrol' }), 9000); };
+$('btn-wander').onclick = async () => { await api('/drone', { event: 'wander' }); setTimeout(() => api('/drone', { event: 'home' }), 7000); setTimeout(() => api('/drone', { event: 'patrol' }), 11000); };
+
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-report],[data-dismiss]');
+  if (!b) return;
+  const me = b.closest('.phone')?.id?.replace('p-', '') || 'mom';
+  if (b.dataset.report) await api('/report', { member: me, kind: b.dataset.report });
+  if (b.dataset.dismiss) { dismissed.add(S.call.caller + 'mom'); dismissed.add(S.call.caller + 'dad'); render(); }
+});
 
 poll();

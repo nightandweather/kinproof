@@ -496,3 +496,11 @@ body.solo .cal-head{flex-wrap:wrap;gap:6px}
 .photos figcaption{position:absolute;left:6px;top:6px;font-size:10px;font-weight:800;color:#fff;background:#0009;border-radius:99px;padding:1px 7px}
 .photos .cam{position:absolute;right:6px;bottom:5px;font-size:9px;color:#fff;background:#0007;border-radius:99px;padding:1px 6px}
 .card.photo .card-top{background:#e6fcf5;color:#0b7a5a}
+
+.h-yard .h-head{flex-wrap:wrap;row-gap:6px}
+.tg.drone{color:#69db7c}
+
+.card.report .card-top{background:#fff5f5;color:#c92a2a}
+.card-btns button.r112{color:#fff;background:#f03e3e}
+.pack{font-size:12px;color:var(--dim);margin-top:4px}
+.tg.report{color:#ff6b6b}

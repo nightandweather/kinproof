@@ -92,6 +92,7 @@
       <div class="sys">Kinproof syncs facts from your ChatGPT — never the chat itself.</div>
       <div id="approvals-mom" class="approvals"></div>
       <div id="private-mom" class="private"></div>
+      <div id="offers-mom" class="feed"></div>
       <div id="feed-mom" class="feed"></div>
     </div>
     <div class="composer stack"><div class="homeask"><input id="ask-mom" placeholder="🏠 할머니 댁에 부탁하기… (예: 목욕물 받아줘)"><button data-ask="mom">보내기</button></div><button class="sync" data-sync="mom_chatgpt">↻ Sync ChatGPT</button></div>
@@ -148,6 +149,7 @@
     <div class="room">
       <div id="mysched-dad" class="mysched"></div>
       <div id="topics-dad" class="topics"></div>
+      <div id="offers-dad" class="feed"></div>
       <div id="feed-dad" class="feed"></div>
     </div>
     <div class="composer stack"><div class="homeask"><input id="ask-dad" placeholder="🏠 할머니 댁에 부탁하기… (예: 목욕물 받아줘)"><button data-ask="dad">보내기</button></div><div style="display:flex;gap:8px"><button class="sync" data-view="map">🗺 Family map</button><button class="sync alt" data-view="hub">🏠 Home</button></div></div>
@@ -185,7 +187,9 @@
   </section>
   <section class="hcard h-yard">
     <div class="h-head"><div class="h-title">🏠 Grandma's home <span class="h-sub">34평 아파트</span> <span class="sim">SIMULATED</span></div>
-      <span><button id="btn-med" class="small">💊 Medicine</button> <button id="btn-spill" class="small">💧 Spill</button> <button id="btn-laundry" class="small">🧺 Washer</button> <button id="btn-motion" class="small">🚪 Door</button></span></div>
+      <span class="seg" style="display:inline-flex"><button data-homemode="in" class="on">🏠 집 안</button><button data-homemode="out">🚁 단지 밖</button></span>
+      <span id="home-in-btns"><button id="btn-med" class="small">💊 Medicine</button> <button id="btn-spill" class="small">💧 Spill</button> <button id="btn-laundry" class="small">🧺 Washer</button> <button id="btn-motion" class="small">🚪 Door</button></span>
+      <span id="home-out-btns" class="hidden"><button id="btn-stranger" class="small">🕵 Stranger</button> <button id="btn-wander" class="small">🚶 Night walk</button></span></div>
     <div id="yard" class="yard"></div>
   </section>
   <section class="hcard h-log">

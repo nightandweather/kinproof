@@ -13,19 +13,39 @@ Built in 5 hours at **c0mpiled-17 Seoul** for YC RFS **AI for the Aging Populati
 
 ## What it does
 
-1. **Auto-sync AI chats → family wiki.** A conversation lands in `inbox/`. The model extracts only family-relevant
-   facts and dated events, and names what it deliberately kept private ("이직 고민", "연애 선물"). Nothing is shared
-   until the person whose chat it was taps **Share**.
-2. **Shared schedule → per-person reminders.** Mom tells ChatGPT she's taking Grandma to the hospital Thursday at 2.
-   Grandma and Ji-hoon each get the reminder that matters to them. The same event mentioned in two people's chats is merged.
-3. **Live call guard.** Grandma gets a call: "할머니, 나야 지훈이. 폰이 깨져서…"
-   - Speech-to-text → the model extracts evidence as **verbatim quotes**
-   - Code verifies every quote exists in the call transcript, and every wiki quote exists in the wiki — invented evidence is dropped
-   - Code computes a deterministic, monotonic risk score
-   - **Live presence check:** the caller claims to be Ji-hoon, but Ji-hoon's phone is not on a call → his phone asks *"Is this you?"*
-   - **Contradiction:** "I'm in Busan" vs. the wiki line Ji-hoon himself approved: "판교 사무실 출근 this week"
-   - Ji-hoon taps **Not me** → call blocked. The real person has the final say.
-4. **Real family, no false alarm.** When the real Ji-hoon calls, he is on a call and the story matches the wiki: score stays SAFE.
+**The family:** Grandma (78) lives alone in a Songpa apartment. Mom is a nurse at Bundang SNU Hospital, Dad a developer in
+Pangyo (family admin), grandson Ji-hoon works in Gangnam. Four phones, one family context.
+
+0. **Everyone opts in.** Each member installs Kinproof and agrees (AI-chat facts with approval, "on a call?" status, location).
+   Protection turns on only when all four agree.
+1. **Auto-sync AI chats → family wiki.** A conversation lands in `inbox/`. The model extracts only family-relevant facts and
+   dated events, and names what it deliberately kept private ("이직 고민", "연애 선물"). Nothing is shared until the person whose
+   chat it was taps **Share**. Kept-private topics stay labels only; a member may choose to share a label with the admin.
+2. **Shared schedule → per-person reminders.** Mom tells ChatGPT she's taking Grandma to the hospital Thursday at 2: Grandma and
+   Ji-hoon each get their reminder. Duplicates across chats merge. Week calendar, hour-by-member timetable, chores split.
+3. **Grandma just talks.** One big button. Plans go straight into the family schedule; questions ("이번 주 금요일에 뭐 있어?") are
+   answered from the schedule and read aloud.
+4. **Live call guard (the core).** Grandma gets a call: "할머니, 나야 지훈이. 폰이 깨져서…"
+   - Speech-to-text → the model extracts evidence as **verbatim quotes**; code verifies every call quote and wiki quote — invented evidence is dropped
+   - Code computes a deterministic, monotonic risk score from evidence + checks a clone cannot copy:
+     - **Presence:** Ji-hoon's real phone is not on any call (defeats spoofed caller ID and cloned SIMs)
+     - **GPS:** caller says Busan, Ji-hoon's phone is in Gangnam (only "match / no match" is used — the location is never shown)
+     - **Wiki:** "this week at the Gangnam office", approved from Ji-hoon's own Claude chat
+     - **Do Not Disturb:** he is at work with DND on — the identity check is sent as an emergency that bypasses DND
+   - The voice itself is shown as **"sounds like Ji-hoon — not trusted"**: clones sound the same, so we verify instead of detect
+   - A plain-language reason built by code ("지훈이는 지금 강남에 있는데, 전화한 사람은 부산에 있다고 하네요…")
+   - Ji-hoon taps **Not me** → blocked; Mom and Dad are told why. The real person has the final say.
+   - Real Ji-hoon calling at lunch: on a call, story matches → stays SAFE.
+5. **Grandma's home (SIMULATED devices, 34평 apartment).** Robot brings water + the right pill pouch and confirms intake; spots water
+   on the kitchen floor, warns Grandma, mops it, sends before/after photos; door camera flags a stranger; washer nudges whoever owns
+   the drying chore. Family members can **ask the home** by text ("목욕물 받아줘", "할머니께 7시에 데리러 간다고 전해줘"):
+   bath capped at 40 °C in code, door/gas requests refused in code.
+6. **Home Protector & map.** One screen with calendar/timetable, to-dos, family status (GPS, on a call, DND), agent log of every
+   decision. Family map for the admin unlocks only when everyone consents (OpenStreetMap).
+
+**Demo helpers:** ▶ Story mode plays "a day with the Kim family" with captions. `?as=jihoon` turns any phone (e.g. a real iPhone)
+into that member's app with a bottom tab bar. `scripts/import_call_audio.py` turns a call recording (e.g. an ElevenLabs clone of the
+presenter's own voice) into a replay: timing from the audio, sentence text aligned to the known script, audio played in sync.
 
 ## Design principles
 
@@ -87,6 +107,8 @@ Demo: **Sync ChatGPT** (Mom) and **Sync Claude** (Ji-hoon) → **Share** the pro
 
 - ChatGPT/Claude subscriptions have no public API for pulling chats. The demo syncs exported conversations; the product
   direction is exposing the wiki as an **MCP connector** each family member adds to their own assistant.
-- Presence is a toggle in the demo; on a phone it would come from the OS call state reported by a family app.
+- Presence, GPS, DND and all home devices (robot, door camera, washer, bath, speaker) are simulated in the demo; in the product they
+  come from a family app reporting OS call state / location and from home device APIs.
+- Spill photos are AI-generated stand-ins for a robot camera (labeled "simulated cam" in the UI).
 - Web Speech sends audio to Google; production would use on-device STT.
 - Next on the same wiki: medication check-ins, caregiver hand-offs, a shared scam-pattern network across families.
