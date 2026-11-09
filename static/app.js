@@ -7,6 +7,11 @@ const api = (path, body) => fetch('/api' + path, {
   body: body === undefined ? undefined : JSON.stringify(body),
 }).then((r) => r.json());
 
+// Only touch the DOM when content changed, so entry animations don't replay on every poll.
+Object.defineProperty(Element.prototype, 'html', {
+  set(v) { if (this._h !== v) { this._h = v; this.innerHTML = v; } },
+});
+
 const TYPE_LABEL = {
   FAMILY_CLAIM: 'Claims to be family', AUTHORITY_CLAIM: 'Claims authority', URGENCY: 'Urgency',
   MONEY_REQUEST: 'Money request', UNUSUAL_PAYMENT: 'Unusual payment', SECRECY: 'Secrecy',
@@ -18,7 +23,7 @@ const WEIGHTS = { FAMILY_CLAIM: 15, AUTHORITY_CLAIM: 25, URGENCY: 15, MONEY_REQU
   SECRECY: 20, CHANNEL_SWITCH: 20, CREDENTIAL_REQUEST: 30, DISTRESS_STORY: 10, CONTEXT_CONTRADICTION: 25, PRESENCE_MISMATCH: 30 };
 const LEVEL_COLOR = { SAFE: 'var(--safe)', CAUTION: 'var(--caution)', ALERT: 'var(--alert)' };
 
-let S = null, wikiPage = 'jihoon', lastWikiPageHighlight = 0, lastVerdict = null;
+let S = null, wikiPage = 'jihoon', lastWikiPageHighlight = 0, lastVerdict;  // undefined until first state: no flash on page load
 
 function renderSteps() {
   const c = S.call;
@@ -33,7 +38,7 @@ function renderSteps() {
     el.className = 'step' + (state[n] ? ' done' : n === active ? ' active' : '');
   });
   if (c.verdict !== lastVerdict) {
-    if (c.verdict === 'blocked') { const f = $('flash'); f.classList.remove('on'); void f.offsetWidth; f.classList.add('on'); }
+    if (c.verdict === 'blocked' && lastVerdict !== undefined) { const f = $('flash'); f.classList.remove('on'); void f.offsetWidth; f.classList.add('on'); }
     lastVerdict = c.verdict;
   }
 }
@@ -77,9 +82,9 @@ function render() {
 
   const tr = $('transcript');
   const trHtml = c.transcript.map((u) => `<div class="utt"><span class="t">${u.t.toFixed(1)}s</span>${esc(u.text)}</div>`).join('');
-  if (tr.dataset.n != c.transcript.length) { tr.innerHTML = trHtml; tr.scrollTop = 1e9; tr.dataset.n = c.transcript.length; }
+  if (tr.dataset.n != c.transcript.length) { tr.html = trHtml; tr.scrollTop = 1e9; tr.dataset.n = c.transcript.length; }
 
-  $('signals').innerHTML = c.signals.map((s) => {
+  $('signals').html = c.signals.map((s) => {
     const cls = s.by === 'code' ? 'code' : (s.type === 'CONTEXT_CONTRADICTION' ? 'wiki' : '');
     const wq = s.wiki_quote ? `<div class="wq">📚 wiki/${esc(s.wiki_page)}.md: “${esc(s.wiki_quote)}”</div>` : '';
     return `<div class="chip ${cls}"><span class="pts">+${WEIGHTS[s.type] ?? ''}${s.by === 'code' ? ' · code' : ''}</span>
@@ -91,10 +96,10 @@ function render() {
   // feeds + approvals
   for (const m of Object.keys(S.members)) {
     const feed = $('feed-' + m);
-    if (feed) feed.innerHTML = S.notifications.filter((n) => n.member === m && n.kind !== 'confirm_request')
+    if (feed) feed.html = S.notifications.filter((n) => n.member === m && n.kind !== 'confirm_request')
       .map((n) => `<div class="note ${n.kind}"><span class="ts">${n.ts}</span> ${esc(n.text)}</div>`).join('');
     const ap = $('approvals-' + m);
-    if (ap) ap.innerHTML = S.approvals.filter((a) => a.member === m).map((a) => {
+    if (ap) ap.html = S.approvals.filter((a) => a.member === m).map((a) => {
       const p = a.payload;
       const body = a.kind === 'fact' ? `${esc(p.text)} <span class="src">→ wiki/${esc(p.about)}.md</span>`
         : `${esc(p.title)} · ${esc(p.date)} ${esc(p.time || '')} <span class="src">→ notify ${p.notify.map((n) => n.member).join(', ')}</span>`;
@@ -117,19 +122,19 @@ function render() {
   const hl = S.wiki_highlights;
   if (hl.length > lastWikiPageHighlight) { wikiPage = hl[hl.length - 1].page; lastWikiPageHighlight = hl.length; }
   if (!pages.includes(wikiPage)) wikiPage = pages[0];
-  $('wiki-tabs').innerHTML = pages.map((p) => `<button class="${p === wikiPage ? 'on' : ''}" data-page="${p}">${p}.md</button>`).join('');
+  $('wiki-tabs').html = pages.map((p) => `<button class="${p === wikiPage ? 'on' : ''}" data-page="${p}">${p}.md</button>`).join('');
   let body = esc(S.wiki[wikiPage] || '').replace(/&lt;!--(.*?)--&gt;/g, '<span class="src">↳$1</span>');
   for (const h of hl.filter((h) => h.page === wikiPage)) body = body.split(esc(h.quote)).join(`<mark>${esc(h.quote)}</mark>`);
-  $('wiki-body').innerHTML = body;
+  $('wiki-body').html = body;
 
-  $('events').innerHTML = S.events.map((e) => `<div class="ev ${e.done ? 'done' : ''}"><div><b>${esc(e.title)}</b><br>
+  $('events').html = S.events.map((e) => `<div class="ev ${e.done ? 'done' : ''}"><div><b>${esc(e.title)}</b><br>
     <span class="ts">${esc(e.date)} ${esc(e.time || '')} · ${esc(S.members[e.owner]?.name_en || e.owner)}</span></div>
     ${e.done ? '' : `<button class="small ghost" data-done="${e.id}">done</button>`}</div>`).join('') || '<div class="dropped">No events yet</div>';
-  $('log').innerHTML = S.ingest_log.slice(0, 12).map(esc).join('<br>');
+  $('log').html = S.ingest_log.slice(0, 12).map(esc).join('<br>');
 
   const sel = $('replay-select');
   const opts = '<option value="">Replay…</option>' + S.recordings.map((r) => `<option>${r}</option>`).join('');
-  if (sel.dataset.v !== opts) { sel.innerHTML = opts; sel.dataset.v = opts; }
+  if (sel.dataset.v !== opts) { sel.html = opts; sel.dataset.v = opts; }
   $('btn-call').textContent = STT.running ? '🔴 Listening… (stop)' : '📞 Start live call';
 }
 
