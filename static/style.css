@@ -1,0 +1,97 @@
+:root{
+  --bg:#0d0f14; --panel:#161a22; --panel2:#1d222c; --line:#2a303c; --text:#e8ebf1; --dim:#8c94a5;
+  --safe:#2fbf71; --caution:#f2b134; --alert:#ef4b4b; --accent:#7c9cff; --wiki:#c9a0ff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Segoe UI",sans-serif}
+button{font:inherit;color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);color:#0b0d12;border-color:var(--accent);font-weight:600}
+button.ghost{background:transparent}
+button.small{padding:2px 8px;font-size:12px}
+button.ok{background:var(--safe);color:#06120b;border-color:var(--safe);font-weight:700}
+button.danger{background:var(--alert);color:#fff;border-color:var(--alert);font-weight:700}
+select{font:inherit;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:6px}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);gap:12px;flex-wrap:wrap}
+.brand{font-weight:700;font-size:18px}
+.logo{color:var(--accent)}
+.tag{font-weight:400;font-size:13px;color:var(--dim);margin-left:8px}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;background:var(--panel2);border:1px solid var(--line)}
+.badge.replay{background:#3b2e10;color:var(--caution);border-color:var(--caution)}
+
+.grid{display:grid;grid-template-columns:1.25fr 1fr 1fr 1.15fr;gap:12px;padding:12px;height:calc(100vh - 58px)}
+@media (max-width:1100px){.grid{grid-template-columns:1fr 1fr;height:auto}}
+.phone,.wiki{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:12px;overflow:auto;display:flex;flex-direction:column;gap:10px;min-height:0}
+.phone-head{display:flex;justify-content:space-between;align-items:baseline}
+.who{font-weight:700;font-size:16px}
+.sub{color:var(--dim);font-size:12px}
+.section-label{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.04em}
+.hint{text-transform:none;letter-spacing:0;opacity:.7}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+
+.call{border-radius:14px;padding:10px;background:var(--panel2);border:2px solid var(--line);transition:border-color .3s}
+.call.SAFE{border-color:var(--safe)} .call.CAUTION{border-color:var(--caution)} .call.ALERT{border-color:var(--alert)}
+.call.idle{border-color:var(--line)}
+.call-top{display:flex;justify-content:space-between;align-items:flex-start}
+.caller{font-weight:600}
+.claimed{font-size:12px;color:var(--dim)}
+.meter{text-align:right}
+.meter-num{font-size:30px;font-weight:800;line-height:1}
+.meter-lvl{font-size:11px;font-weight:700;letter-spacing:.08em}
+.bar{height:6px;border-radius:9px;background:#0002;margin:8px 0;overflow:hidden}
+#bar-fill{height:100%;width:0;background:var(--safe);transition:width .5s,background .5s}
+.transcript{max-height:190px;overflow:auto;display:flex;flex-direction:column;gap:4px}
+.utt{background:#0003;border-radius:8px;padding:5px 8px}
+.utt .t{color:var(--dim);font-size:11px;margin-right:6px}
+.interim{color:var(--dim);font-style:italic;min-height:1.2em}
+.verdict{border-radius:10px;padding:10px;font-weight:800;font-size:17px;text-align:center;margin:6px 0}
+.verdict.blocked{background:var(--alert);color:#fff}
+.verdict.verified{background:var(--safe);color:#06120b}
+.verdict.degraded{background:#3b2e10;color:var(--caution)}
+.hidden{display:none}
+
+.signals{display:flex;flex-direction:column;gap:6px}
+.chip{border-left:4px solid var(--caution);background:var(--panel2);border-radius:8px;padding:6px 8px;animation:pop .35s ease}
+.chip.code{border-left-color:var(--accent)}
+.chip.wiki{border-left-color:var(--wiki)}
+.chip .type{font-size:11px;font-weight:700;letter-spacing:.05em}
+.chip .pts{float:right;font-size:11px;color:var(--dim)}
+.chip .q{margin-top:2px}
+.chip .en{color:var(--dim);font-size:12px}
+.chip .wq{margin-top:4px;font-size:12px;color:var(--wiki)}
+.dropped{font-size:11px;color:var(--dim)}
+@keyframes pop{from{transform:scale(.96);opacity:0}to{transform:none;opacity:1}}
+
+.feed{display:flex;flex-direction:column;gap:6px}
+.note{background:var(--panel2);border-radius:10px;padding:7px 9px;border-left:3px solid var(--line);animation:pop .35s ease}
+.note.reminder{border-left-color:var(--accent)}
+.note.alert{border-left-color:var(--alert)}
+.note.approval{border-left-color:var(--wiki)}
+.note.confirm_request{border-left-color:var(--caution)}
+.note.info{border-left-color:var(--safe)}
+.note .ts{color:var(--dim);font-size:11px}
+
+.approvals{display:flex;flex-direction:column;gap:6px}
+.appr{background:#221b2e;border:1px solid #4a3a66;border-radius:10px;padding:8px}
+.appr .k{font-size:11px;color:var(--wiki);font-weight:700}
+.appr .src{font-size:11px;color:var(--dim)}
+.appr .btns{display:flex;gap:6px;margin-top:6px}
+
+.presence{display:flex;justify-content:space-between;align-items:center;background:var(--panel2);border-radius:10px;padding:8px}
+.confirm{background:#3b1414;border:2px solid var(--alert);border-radius:12px;padding:10px;animation:pop .35s ease}
+.confirm-text{font-weight:700;margin-bottom:8px}
+.confirm-btns{display:flex;gap:8px}
+.confirm-btns button{flex:1;padding:10px}
+
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tabs button{padding:3px 9px;font-size:12px}
+.tabs button.on{border-color:var(--wiki);color:var(--wiki)}
+.wiki-body{white-space:pre-wrap;background:var(--panel2);border-radius:10px;padding:10px;margin:0;font:13px/1.55 ui-monospace,Menlo,monospace;min-height:110px}
+.wiki-body mark{background:var(--alert);color:#fff;border-radius:3px;padding:0 2px}
+.wiki-body .src{color:var(--dim)}
+.events{display:flex;flex-direction:column;gap:6px}
+.ev{background:var(--panel2);border-radius:10px;padding:7px 9px;display:flex;justify-content:space-between;align-items:center}
+.ev.done{opacity:.5;text-decoration:line-through}
+.log{font:11px/1.5 ui-monospace,Menlo,monospace;color:var(--dim)}

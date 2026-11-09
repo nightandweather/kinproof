@@ -1,0 +1,9 @@
+.env
+__pycache__/
+.pytest_cache/
+data/state.json
+data/wiki/*.md
+inbox/*.md
+inbox/processed/*.md
+*.aiff
+.DS_Store
