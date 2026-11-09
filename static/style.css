@@ -504,3 +504,13 @@ body.solo .cal-head{flex-wrap:wrap;gap:6px}
 .card-btns button.r112{color:#fff;background:#f03e3e}
 .pack{font-size:12px;color:var(--dim);margin-top:4px}
 .tg.report{color:#ff6b6b}
+
+.sms{background:#fff;border-radius:14px;padding:8px 10px;border-left:4px solid #ced4da;animation:pop .35s ease}
+.sms.high{border-left-color:var(--alert);background:#fff5f5}
+.sms.watch{border-left-color:var(--caution)}
+.sms .from{font-size:11px;font-weight:800;color:var(--dim);display:flex;justify-content:space-between}
+.sms .body{font-size:13px;margin-top:2px;word-break:break-all}
+.sms .verdict{display:inline-block;margin-top:5px;font-size:11px;font-weight:800;border-radius:99px;padding:2px 8px;background:#e6fcf5;color:var(--safe)}
+.sms.high .verdict{background:#ffe3e3;color:#c92a2a} .sms.watch .verdict{background:#fff4e6;color:#e8590c}
+.tg.message{color:#ffd8a8}
+#msg-select{max-width:130px}

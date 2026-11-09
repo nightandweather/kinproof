@@ -130,6 +130,11 @@ function renderPeople() {
       return botCard('ask', a.kind === 'fact' ? 'Share this fact?' : 'Add to family schedule?', body, '', btns);
     }).join('');
   }
+  // SMS / app notifications on Grandma's phone
+  $('msgs-grandma').html = (S.messages || []).filter((m) => m.member === 'grandma').slice(0, 4).map((m) =>
+    `<div class="sms ${m.risk}"><div class="from"><span>📩 ${esc(m.sender)}</span><span>${esc(m.ts)}</span></div><div class="body">${esc(m.text)}</div>
+     <span class="verdict">${m.risk === 'high' ? '⚠ ' + esc(m.reasons.join(' · ')) : m.risk === 'watch' ? '👀 ' + esc(m.reasons.join(' · ')) : '✓ OK'}</span>${m.held ? ' <span class="verdict">🏦 hold requested</span>' : ''}</div>`).join('');
+
   // one-tap 112 report offer (family confirms; never automatic)
   const reported = (k) => (S.reports || []).some((r) => r.kind === k);
   const offers = [];
@@ -141,6 +146,10 @@ function renderPeople() {
   if ((S.drone || {}).event === 'wander' && !reported('wander')) {
     offers.push(botCard('report', '🚨 Grandma out alone at night', `<b>Ask 112 for help finding her?</b><div class="pack">📍 drone live location attached</div>`, '',
       `<div class="card-btns"><button class="r112" data-report="wander">Request 112</button><button data-dismiss="wander">She's OK</button></div>`));
+  }
+  for (const msg of (S.messages || []).filter((x) => x.risk === 'high' && ['transfer', 'payment'].includes(x.kind) && !x.held)) {
+    offers.push(botCard('report', '💸 Hold this transfer?', `<b>${msg.amount.toLocaleString()}원 left Grandma's account</b><div class="pack">${esc(msg.reasons.join(' · '))} · ${esc(msg.sender)}</div>`, '',
+      `<div class="card-btns"><button class="r112" data-hold="${msg.id}">Ask bank to hold</button><button data-dismiss="hold">Not now</button></div>`));
   }
   for (const m of ['mom', 'dad']) {
     const el = $('offers-' + m);
@@ -869,6 +878,19 @@ document.addEventListener('click', async (e) => {
   const me = b.closest('.phone')?.id?.replace('p-', '') || 'mom';
   if (b.dataset.report) await api('/report', { member: me, kind: b.dataset.report });
   if (b.dataset.dismiss) { dismissed.add(S.call.caller + 'mom'); dismissed.add(S.call.caller + 'dad'); render(); }
+});
+
+const MSG_PRESETS = {
+  smish: { sender: '+82 10-****-2290', text: '[국외발신] 고객님 택배가 주소 불일치로 보관 중입니다. 주소 확인: http://bit.ly/3kP0xQ' },
+  transfer: { sender: '신한은행', text: '[Web발신] 신한 11/09 11:06 출금 3,000,000원 김민수 잔액 412,350원' },
+  normal: { sender: '국민건강보험', text: '[국민건강보험] 김순자님 2026년 건강검진 대상자입니다. 가까운 검진기관에서 받으세요.' },
+};
+$('msg-select').onchange = async (e) => { const p = MSG_PRESETS[e.target.value]; e.target.value = ''; if (p) await api('/message', { member: 'grandma', ...p }); };
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-hold]');
+  if (!b) return;
+  const me = b.closest('.phone')?.id?.replace('p-', '') || 'dad';
+  await api(`/message/${b.dataset.hold}/hold`, { member: me });
 });
 
 poll();

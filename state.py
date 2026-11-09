@@ -64,6 +64,7 @@ def fresh() -> dict:
         "robot": {"stage": "docked", "med": "혈압약", "ts": ""},
         "spill": {"stage": "none", "room": "주방"},
         "drone": {"event": "patrol", "ts": ""},
+        "messages": [],  # SMS / app notifications on the elder's phone, analyzed
         "reports": [],   # one-tap 112 reports, always confirmed by a family member (SIMULATED: nothing is dialed)
         "home": {"bath": {"status": "idle", "temp": None}, "speaker": "",
                  "lights": {"거실": True, "주방": True, "안방": False, "작은방1": False, "작은방2": False, "욕실": False}},

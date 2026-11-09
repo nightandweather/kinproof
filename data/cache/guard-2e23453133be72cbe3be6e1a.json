@@ -1,0 +1,16 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "claimed_location": null,
+  "claimed_identity": "dad",
+  "signals": [
+   {
+    "type": "FAMILY_CLAIM",
+    "quote": "나야, 준호.",
+    "quote_en": "It's me, Junho.",
+    "wiki_page": null,
+    "wiki_quote": null
+   }
+  ]
+ }
+}

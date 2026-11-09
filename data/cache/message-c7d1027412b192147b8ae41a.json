@@ -1,0 +1,11 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "kind": "normal",
+  "amount_krw": null,
+  "counterparty": null,
+  "has_link": false,
+  "impersonates": null,
+  "summary_ko": "국민건강보험에서 김순자님이 2026년 건강검진 대상자라고 안내했습니다."
+ }
+}

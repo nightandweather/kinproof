@@ -1,0 +1,30 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "claimed_location": "부산",
+  "claimed_identity": "dad",
+  "signals": [
+   {
+    "type": "URGENCY",
+    "quote": "급하게 필요해",
+    "quote_en": "I need it urgently.",
+    "wiki_page": null,
+    "wiki_quote": null
+   },
+   {
+    "type": "MONEY_REQUEST",
+    "quote": "합의금이 급하게 필요해",
+    "quote_en": "I urgently need settlement money.",
+    "wiki_page": null,
+    "wiki_quote": null
+   },
+   {
+    "type": "CONTEXT_CONTRADICTION",
+    "quote": "합의금이 급하게 필요해",
+    "quote_en": "I urgently need settlement money.",
+    "wiki_page": "family",
+    "wiki_quote": "돈 이야기는 전화로 하지 않고 직접 만나서 한다"
+   }
+  ]
+ }
+}

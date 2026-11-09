@@ -14,6 +14,7 @@ import config
 import guard
 import home
 import ingest
+import messages
 import state
 
 
@@ -101,6 +102,16 @@ class DroneEvent(BaseModel):
 class Report(BaseModel):
     member: str
     kind: str     # scam | wander
+
+
+class MessageIn(BaseModel):
+    member: str = "grandma"
+    sender: str
+    text: str
+
+
+class Hold(BaseModel):
+    member: str
 
 
 class CallEnd(BaseModel):
@@ -379,6 +390,18 @@ def report(body: Report):
         if m != config.PROTECTED:
             state.notify(m, "info", f"🚨 {config.MEMBERS[body.member]['name']}가 112에 신고했어요 ({'보이스피싱' if body.kind == 'scam' else '실종 우려'}). 증거 묶음 전송 완료 (데모: 실제 발신 없음)")
     return {"ok": True}
+
+
+@app.post("/api/message")
+def message(body: MessageIn):
+    _member(body.member)
+    return messages.receive(body.member, body.sender, body.text)
+
+
+@app.post("/api/message/{mid}/hold")
+def message_hold(mid: str, body: Hold):
+    _member(body.member)
+    return {"ok": messages.hold(body.member, mid)}
 
 
 @app.post("/api/call/start")

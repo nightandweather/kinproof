@@ -1,0 +1,16 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "claimed_location": "부산",
+  "claimed_identity": "dad",
+  "signals": [
+   {
+    "type": "DISTRESS_STORY",
+    "quote": "차 사고가 났어",
+    "quote_en": "I was in a car accident.",
+    "wiki_page": null,
+    "wiki_quote": null
+   }
+  ]
+ }
+}

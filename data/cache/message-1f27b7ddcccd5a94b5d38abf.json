@@ -1,0 +1,11 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "kind": "transfer",
+  "amount_krw": 3000000,
+  "counterparty": "김민수",
+  "has_link": false,
+  "impersonates": null,
+  "summary_ko": "신한은행 계좌에서 김민수에게 300만 원이 출금되었습니다."
+ }
+}

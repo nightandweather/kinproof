@@ -1,0 +1,11 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "kind": "transfer",
+  "amount_krw": 3000000,
+  "counterparty": "박정우",
+  "has_link": false,
+  "impersonates": null,
+  "summary_ko": "신한은행 계좌에서 박정우에게 300만 원이 출금됐다는 알림입니다."
+ }
+}
