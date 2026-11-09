@@ -726,24 +726,25 @@ async function story() {
   try {
     setView('demo');
     await api('/reset', {}); seenEvents.clear(); seenLines.clear(); lastWikiPageHighlight = 0;
-    caption('', "Meet my family. My mother, 78, lives alone in a Songpa apartment. My wife is a nurse at Bundang SNU Hospital. Our son Ji-hoon is 15 and at hagwon every night. I'm a developer in Pangyo."); await sleep(5200);
+    caption('', '2025: SIM data of millions leaked. Your number can be cloned. Your voice too.'); await sleep(3500);
+    caption('', "My mother, 78, lives alone. My wife is a nurse, my son Ji-hoon is 15 and at hagwon every night. I'm a developer in Pangyo."); await sleep(3800);
     caption('08:50', 'Each of us installs Kinproof. Protection starts only when everyone agrees.');
-    for (const m of ['grandma', 'dad', 'mom', 'jihoon']) { await sleep(700); await api('/consent', { member: m, share: true, onboarding: true }); }
+    for (const m of ['grandma', 'dad', 'mom', 'jihoon']) { await sleep(450); await api('/consent', { member: m, share: true, onboarding: true }); }
     await sleep(1500);
 
     setView('hub'); homeMode = 'in';
     caption('09:00', "Medicine time. The home robot brings Grandma water and today's blood-pressure pills.");
-    $('btn-med').click(); await sleep(9500);
+    $('btn-med').click(); await sleep(6500);
     caption('10:40', 'The robot spots water on the kitchen floor — a slip-and-fall risk. It warns Grandma, mops it up, and sends my wife before/after photos.');
-    $('btn-spill').click(); await sleep(7000);
+    $('btn-spill').click(); await sleep(5600);
 
     setView('demo');
     const syncAndShare = async (m, sample, line) => {
       caption(line[0], line[1]);
       await api('/sync/' + sample, {});
-      await waitFor(() => S.approvals.some((a) => a.member === m), 30000); await sleep(1500);
-      for (const a of S.approvals.filter((a) => a.member === m)) { await api('/approvals/' + a.id, { decision: 'approve' }); await sleep(300); }
-      await sleep(1500);
+      await waitFor(() => S.approvals.some((a) => a.member === m), 30000); await sleep(900);
+      for (const a of S.approvals.filter((a) => a.member === m)) { await api('/approvals/' + a.id, { decision: 'approve' }); await sleep(200); }
+      await sleep(900);
     };
     await syncAndShare('mom', 'mom_chatgpt', ['09:20', "My wife tells ChatGPT she's taking Grandma to the hospital Thursday. Kinproof shares the appointment — not the chat. Her job worries stay private."]);
     await syncAndShare('dad', 'dad_chatgpt', ['09:30', "My ChatGPT knows I'm at the Pangyo office all week and booked Friday dinner. That's shared. My stock losses aren't."]);
@@ -752,7 +753,7 @@ async function story() {
     caption('10:10', 'Grandma just talks. No apps, no menus.');
     const r = await api('/voice', { member: 'grandma', text: '이번 주 금요일에 뭐 있어?' });
     if (r.reply) STT.say(r.reply);
-    await sleep(5500);
+    await sleep(4200);
 
     caption('11:02', '“Mom, it\'s me, Jun-ho. My phone broke…” — a scammer with my voice, cloned from ten seconds of video.');
     await api('/presence', { member: 'dad', on_call: false });
@@ -765,20 +766,18 @@ async function story() {
       caption('11:03', 'The caller says Busan. My phone says Pangyo. The family wiki agrees with my phone.');
       await waitFor(() => S.call.level === 'ALERT', 30000); await sleep(3500);
       caption('11:03', 'I tap “Not me”. Blocked. My wife gets the reasons — and a one-tap 112 report with the evidence.');
-      await api('/call/confirm', { member: 'dad', is_me: false }); await sleep(5000);
+      await api('/call/confirm', { member: 'dad', is_me: false }); await sleep(3800);
     }
 
     setView('hub');
-    caption('11:05', 'Home Protector: the whole family on one screen — calendar, to-dos, and a log of every decision the agent made.'); await sleep(6000);
+    caption('11:05', 'Home Protector: the whole family on one screen — calendar, to-dos, and a log of every decision the agent made.'); await sleep(4000);
     homeMode = 'out'; render();
     caption('23:40', 'Late at night Grandma walks out of the building alone. The patrol drone follows at a distance and the family gets her live location — until she is safely home.');
-    $('btn-wander').click(); await sleep(8500);
+    $('btn-wander').click(); await sleep(6500);
     homeMode = 'in';
 
-    setView('map');
-    caption('21:00', 'As family admin I can see where everyone is — only because everyone agreed.'); await sleep(5500);
 
-    caption('', "Kinproof. Voice isn't proof anymore — family is."); await sleep(4500);
+    caption('', "Kinproof. Voice isn't proof anymore — family is."); await sleep(3500);
   } finally {
     caption('', ''); storyRunning = false; B.textContent = '▶ Story mode';
   }
