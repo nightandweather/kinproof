@@ -16,8 +16,9 @@ WEIGHTS = {
     "CONTEXT_CONTRADICTION": 25,   # call contradicts the family wiki
     "PRESENCE_MISMATCH": 30,       # claimed person is not on a call (computed in code)
     "GPS_MISMATCH": 25,            # caller's claimed location vs claimed person's live GPS (code)
+    "COMMUNITY_FLAG": 20,          # number already reported by nearby Kinproof families (code)
 }
-CODE_TYPES = {"PRESENCE_MISMATCH", "GPS_MISMATCH"}
+CODE_TYPES = {"PRESENCE_MISMATCH", "GPS_MISMATCH", "COMMUNITY_FLAG"}
 LLM_TYPES = [t for t in WEIGHTS if t not in CODE_TYPES]
 
 COMBOS = [

@@ -114,6 +114,10 @@ class Hold(BaseModel):
     member: str
 
 
+class Share(BaseModel):
+    member: str
+
+
 class CallEnd(BaseModel):
     save_as: str | None = None
 
@@ -402,6 +406,32 @@ def message(body: MessageIn):
 def message_hold(mid: str, body: Hold):
     _member(body.member)
     return {"ok": messages.hold(body.member, mid)}
+
+
+@app.post("/api/community/share")
+def community_share(body: Share):
+    """Opt-in: share the blocked call's PATTERN (no names, no transcript) with nearby Kinproof families."""
+    _member(body.member)
+    with state.LOCK:
+        c = state.S["call"]
+        com = state.S["community"]
+        if c.get("shared") or c["verdict"] != "blocked":
+            return {"ok": False}
+        types = {s["type"] for s in c["signals"]}
+        parts = []
+        if "FAMILY_CLAIM" in types: parts.append("가족 사칭")
+        if "AUTHORITY_CLAIM" in types: parts.append("기관 사칭")
+        if "CHANNEL_SWITCH" in types: parts.append("'폰 고장/친구 폰'")
+        if "DISTRESS_STORY" in types: parts.append("사고 이야기")
+        if "MONEY_REQUEST" in types: parts.append("송금 요구")
+        if "SECRECY" in types: parts.append("비밀 유지 요구")
+        com["feed"].insert(0, {"ago": "방금", "area": "송파구 (우리 가족)", "pattern": " · ".join(parts) or "사칭 전화",
+                               "number": c["caller"], "families": 1, "mine": True})
+        com["blocklist"][c["caller"]] = com["blocklist"].get(c["caller"], 0) + 1
+        c["shared"] = True
+        n = com["families"]
+    state.log(f"{config.MEMBERS[body.member]['name_en']} shared the scam pattern with {n} families in {com['area']} (no names, no transcript)", "community")
+    return {"ok": True}
 
 
 @app.post("/api/call/start")

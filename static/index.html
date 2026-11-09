@@ -23,7 +23,7 @@
     <div class="step" data-step="4"><b>4</b>Real family confirms</div>
   </nav>
   <div class="solo-switch"><a href="?as=grandma" data-as="grandma">👵</a><a href="?as=dad" data-as="dad">👨</a><a href="?as=mom" data-as="mom">👩</a><a href="?as=jihoon" data-as="jihoon">👦</a></div>
-  <div class="views"><button data-view="demo" class="on">📱 Live demo</button><button data-view="hub">🏠 Home Protector</button><button data-view="map">🗺 Map</button><button data-view="wiki">📚 Wiki</button></div>
+  <div class="views"><button data-view="demo" class="on">📱 Live demo</button><button data-view="hub">🏠 Home Protector</button><button data-view="map">🗺 Map</button><button data-view="wiki">📚 Wiki</button><button data-view="community">👥 Community</button></div>
   <div class="controls">
     <span id="mode" class="badge">LIVE</span>
     <button id="btn-call" class="primary">📞 Start live call</button>
@@ -231,11 +231,21 @@
   </section>
 </main>
 
+<main class="communityview hidden" id="communityview">
+  <section class="hcard c-main">
+    <div class="h-head"><div class="h-title">👥 Kinproof families near you <span class="h-sub" id="com-area"></span></div><span class="live-dot">LIVE</span></div>
+    <div id="com-stats" class="com-stats"></div>
+    <div class="h-sub">Only scam <b>patterns</b> and masked numbers are shared — never names, chats or call recordings. Each family opts in.</div>
+    <div id="com-feed" class="com-feed"></div>
+  </section>
+</main>
+
 <nav class="tabbar" id="tabbar">
   <button data-view="demo" class="on"><span>💬</span>Chat</button>
   <button data-view="wiki"><span>📚</span>Wiki</button>
   <button data-view="hub"><span>🏠</span>Home</button>
   <button data-view="map"><span>🗺</span>Map</button>
+  <button data-view="community"><span>👥</span>Near me</button>
 </nav>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="/static/stt.js"></script>

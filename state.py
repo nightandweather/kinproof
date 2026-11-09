@@ -64,7 +64,17 @@ def fresh() -> dict:
         "robot": {"stage": "docked", "med": "혈압약", "ts": ""},
         "spill": {"stage": "none", "room": "주방"},
         "drone": {"event": "patrol", "ts": ""},
-        "messages": [],  # SMS / app notifications on the elder's phone, analyzed
+        "messages": [],
+        "community": {
+            "area": "서울 송파구", "families": 132,
+            "blocklist": {"010-****-7741": 2},
+            "feed": [
+                {"ago": "38분 전", "area": "송파구 잠실동", "pattern": "아들 사칭 · '폰 고장' · 교통사고 합의금", "number": "010-****-7741", "families": 1},
+                {"ago": "1시간 전", "area": "송파구 문정동", "pattern": "아들 사칭 · 친구 폰 · 합의금 300만 원", "number": "010-****-7741", "families": 1},
+                {"ago": "오늘 오전", "area": "강동구 천호동", "pattern": "검찰 사칭 · '안전계좌' 이체 요구", "number": "02-****-1182", "families": 3},
+                {"ago": "어제", "area": "송파구 가락동", "pattern": "택배 주소 불일치 스미싱 링크", "number": "+82 10-****-2290", "families": 7},
+            ],
+        },  # SMS / app notifications on the elder's phone, analyzed
         "reports": [],   # one-tap 112 reports, always confirmed by a family member (SIMULATED: nothing is dialed)
         "home": {"bath": {"status": "idle", "temp": None}, "speaker": "",
                  "lights": {"거실": True, "주방": True, "안방": False, "작은방1": False, "작은방2": False, "욕실": False}},

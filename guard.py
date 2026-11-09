@@ -50,6 +50,14 @@ def start(caller: str):
         state.S["members"][config.PROTECTED]["on_call"] = True
     g = config.MEMBERS[config.PROTECTED]["name_en"]
     state.log(f"📞 {g} is on a call with {caller} — transcription started", "call")
+    with state.LOCK:
+        n = state.S["community"]["blocklist"].get(caller, 0)
+        if n:
+            state.S["call"]["signals"].append({"type": "COMMUNITY_FLAG", "quote": f"{caller}: reported by {n} Kinproof families nearby today",
+                                               "quote_en": f"{n} families in {state.S['community']['area']} already blocked this number",
+                                               "wiki_page": None, "wiki_quote": None, "by": "code"})
+            state.log(f"👥 {caller} was reported by {n} nearby Kinproof families today → +20", "community")
+            _rescore()
     for m, v in config.MEMBERS.items():
         if m != config.PROTECTED:
             state.log(f"📍 {v['name_en']} is at {v['gps']} right now", "gps")

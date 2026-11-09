@@ -17,10 +17,10 @@ const TYPE_LABEL = {
   MONEY_REQUEST: 'Money request', UNUSUAL_PAYMENT: 'Unusual payment', SECRECY: 'Secrecy',
   CHANNEL_SWITCH: 'Unknown-number excuse', CREDENTIAL_REQUEST: 'Credential request',
   DISTRESS_STORY: 'Distress story', CONTEXT_CONTRADICTION: 'Contradicts family wiki',
-  PRESENCE_MISMATCH: 'Live check: not on a call',
+  PRESENCE_MISMATCH: 'Live check: not on a call', GPS_MISMATCH: 'Live check: GPS mismatch', COMMUNITY_FLAG: 'Reported by neighbors',
 };
 const WEIGHTS = { FAMILY_CLAIM: 15, AUTHORITY_CLAIM: 25, URGENCY: 15, MONEY_REQUEST: 30, UNUSUAL_PAYMENT: 20,
-  SECRECY: 20, CHANNEL_SWITCH: 20, CREDENTIAL_REQUEST: 30, DISTRESS_STORY: 10, CONTEXT_CONTRADICTION: 25, PRESENCE_MISMATCH: 30 };
+  SECRECY: 20, CHANNEL_SWITCH: 20, CREDENTIAL_REQUEST: 30, DISTRESS_STORY: 10, CONTEXT_CONTRADICTION: 25, PRESENCE_MISMATCH: 30, GPS_MISMATCH: 25, COMMUNITY_FLAG: 20 };
 const LEVEL_COLOR = { SAFE: 'var(--safe)', CAUTION: 'var(--caution)', ALERT: 'var(--alert)' };
 const NOTE_LABEL = { reminder: 'Family schedule', alert: 'Alert', approval: 'Family wiki', info: 'Kinproof', photo: 'Home robot' };
 const SRC_BADGE = { chatgpt: 'ChatGPT', claude: 'Claude', voice: 'Voice', local: 'Local AI' };
@@ -142,6 +142,10 @@ function renderPeople() {
     const q = S.call.signals.filter((s) => s.by !== 'code').length;
     offers.push(botCard('report', '🚨 Report to 112?', `<b>Voice-phishing evidence pack ready</b><div class="pack">📞 ${esc(S.call.caller)} · 🕐 ${esc(S.call.transcript.length ? 'today' : '')} · 💬 ${q} verified quotes · 🧠 reasons attached</div>`, '',
       `<div class="card-btns"><button class="r112" data-report="scam">Report to 112</button><button data-dismiss="scam">Not now</button></div>`));
+  }
+  if (S.call.verdict === 'blocked' && !S.call.shared) {
+    offers.push(botCard('ask', '👥 Warn nearby families?', `<b>Share this scam pattern with ${S.community.families} Kinproof families in ${esc(S.community.area)}</b><div class="pack">pattern + masked number only · no names, no recording</div>`, '',
+      `<div class="card-btns"><button class="share" data-share="1">Share pattern</button><button data-dismiss="share">Not now</button></div>`));
   }
   if ((S.drone || {}).event === 'wander' && !reported('wander')) {
     offers.push(botCard('report', '🚨 Grandma out alone at night', `<b>Ask 112 for help finding her?</b><div class="pack">📍 drone live location attached</div>`, '',
@@ -377,6 +381,7 @@ function render() {
   renderIdCheck();
   renderYard();
   renderMap();
+  renderCommunity();
   renderOnboarding();
   renderReason();
   renderTopics();
@@ -569,6 +574,7 @@ function setView(v) {
   $('mapview').classList.toggle('hidden', v !== 'map');
   if (v === 'map' && lmap) setTimeout(() => lmap.invalidateSize(), 60);
   $('wikiview').classList.toggle('hidden', v !== 'wiki');
+  $('communityview').classList.toggle('hidden', v !== 'community');
   render();
 }
 
@@ -890,6 +896,25 @@ document.addEventListener('click', async (e) => {
   if (!b) return;
   const me = b.closest('.phone')?.id?.replace('p-', '') || 'dad';
   await api(`/message/${b.dataset.hold}/hold`, { member: me });
+});
+
+function renderCommunity() {
+  if (view !== 'community') return;
+  const c = S.community;
+  $('com-area').textContent = c.area;
+  const blockedToday = c.feed.filter((f) => /분 전|시간 전|방금|오늘/.test(f.ago)).length;
+  $('com-stats').html = `<div class="com-stat"><b>${c.families}</b><span>families protected nearby</span></div>
+    <div class="com-stat"><b>${blockedToday}</b><span>scams blocked today</span></div>
+    <div class="com-stat"><b>${Object.keys(c.blocklist).length}</b><span>numbers on the shared blocklist</span></div>`;
+  $('com-feed').html = c.feed.map((f) => `<div class="com-item ${f.mine ? 'mine' : ''}"><div class="ic">${/스미싱/.test(f.pattern) ? '📩' : /검찰|기관/.test(f.pattern) ? '🏛' : '📞'}</div>
+    <div class="tx"><b>${esc(f.pattern)}</b><span>${esc(f.area)} · ${esc(f.ago)} · ${esc(f.number)}</span></div>
+    <div class="n">${c.blocklist[f.number] ? c.blocklist[f.number] + ' families blocked' : ''}</div></div>`).join('');
+}
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-share]');
+  if (!b) return;
+  const me = b.closest('.phone')?.id?.replace('p-', '') || 'dad';
+  await api('/community/share', { member: me });
 });
 
 poll();

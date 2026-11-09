@@ -514,3 +514,21 @@ body.solo .cal-head{flex-wrap:wrap;gap:6px}
 .sms.high .verdict{background:#ffe3e3;color:#c92a2a} .sms.watch .verdict{background:#fff4e6;color:#e8590c}
 .tg.message{color:#ffd8a8}
 #msg-select{max-width:130px}
+
+.communityview{padding:16px 20px;display:flex;justify-content:center;min-height:0}
+.communityview .c-main{width:min(980px,100%);overflow:auto}
+.com-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.com-stat{background:#f8f9fa;border-radius:16px;padding:12px 14px}
+.com-stat b{display:block;font-size:28px;font-weight:900;letter-spacing:-.03em}
+.com-stat span{font-size:12px;color:var(--dim)}
+.com-feed{display:flex;flex-direction:column;gap:8px}
+.com-item{display:flex;gap:12px;align-items:center;background:#f8f9fa;border-radius:14px;padding:10px 12px;animation:pop .35s ease}
+.com-item.mine{background:#fff9db;box-shadow:inset 0 0 0 2px var(--mine)}
+.com-item .ic{width:38px;height:38px;border-radius:12px;background:#ffe3e3;display:grid;place-items:center;font-size:18px;flex:none}
+.com-item .tx{flex:1;min-width:0}
+.com-item .tx b{display:block;font-size:14px}
+.com-item .tx span{font-size:12px;color:var(--dim)}
+.com-item .n{font-size:12px;font-weight:800;color:#c92a2a;white-space:nowrap}
+.tg.community{color:#ffd43b}
+body.solo .communityview{padding:10px}
+body.solo .com-stats{grid-template-columns:1fr 1fr 1fr;gap:6px} body.solo .com-stat b{font-size:20px}
