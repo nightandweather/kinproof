@@ -720,8 +720,10 @@ $('btn-med').onclick = async () => {
 // ---------- Story mode: "a day with the Kim family" ----------
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function waitFor(fn, ms = 30000) { const t0 = Date.now(); while (Date.now() - t0 < ms) { try { if (fn()) return true; } catch (_) {} await sleep(300); } return false; }
+const SHOW_CAPTIONS = new URLSearchParams(location.search).get('cap') !== '0';
 function caption(time, text) {
   const el = $('caption');
+  if (!SHOW_CAPTIONS) { el.classList.add('hidden'); return; }
   if (!text) { el.classList.add('hidden'); return; }
   $('cap-time').textContent = time || ''; $('cap-text').textContent = text;
   el.classList.remove('hidden'); el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
