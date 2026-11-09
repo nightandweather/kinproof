@@ -3,16 +3,17 @@
 **발표자 = 아빠 준호.** 사기범은 발표자의 목소리를 복제해서 할머니께 전화한다. 발표자가 자기 폰으로 "Not me"를 누른다.
 심사 기준: 문제-해법 명확성 · 기술 구현 · 창의성 / 트랙: AI for the Aging Population × Proving You're Human
 
-| 시간 | 화면 (자막) | 내레이션, 자막을 그대로 읽거나 조금 줄여서 |
+| 시간 | 화면 | 내레이션 (영어, 그대로 읽거나 조금 줄여서) |
 |---|---|---|
-| 0:00–0:08 | "Last year millions of SIM records leaked…" | "Last year millions of SIM records leaked. A phone number can be copied. So can a voice." |
-| 0:08–0:15 | 가족 소개 → 4명 동의 | "This is my family. My mother lives alone. My son is fifteen. We all installed Kinproof." |
-| 0:15–0:24 | 로봇 약, 바닥 물기 | "In the morning a robot brings my mother her pills, and wipes up water before she slips." |
-| 0:24–0:36 | ChatGPT·Claude 동기화 | "We already talk to AI every day. Kinproof shares the dates and plans. Not our worries." |
-| 0:36–0:40 | 할머니 음성 | "My mother doesn't use apps. She just asks." |
-| 0:40–1:05 ⭐ | 복제 음성 통화 → Is this you? → Not me → 차단 | (처음 두 문장은 조용히 들려주기) "That's my voice. Cloned in one minute. I'm in a meeting, my phone isn't on a call, and I'm in Pangyo, not Busan. So it asks me. I tap Not me. Blocked." |
-| 1:05–1:15 | Home Protector, 야간 드론 | "Everything the family needs is on one screen, and every decision is logged." |
-| 1:15–1:20 | 로고 | "Kinproof. A voice isn't proof anymore. Family is." |
+| 0:00–0:06 | **슬라이드 1**: Kinproof 로고 + 한 줄 소개 | "Hi, I'm Kanghoun. This is Kinproof. It checks that a caller is really your family before anyone sends money." |
+| 0:06–0:12 | **슬라이드 2**: 한국 보이스피싱 ₩1.26T, +47%, 건당 ₩53.8M | "Last year Koreans lost 1.26 trillion won to voice phishing. Up 47 percent. 54 million won per victim." |
+| 0:12–0:18 | **슬라이드 3**: 60세 이상 $7.75B, +59% / 번호 유출, 목소리 복제 | "Older adults are hit hardest. Phone numbers leak, voices get cloned, and the parent who lives alone is the easiest target." |
+| 0:18–0:24 | 가족 소개 → 4명 동의 | "This is my family. My mother lives alone. We all installed Kinproof." |
+| 0:24–0:36 | 로봇 약, 바닥 물기 | "In the morning a robot brings her pills and wipes up water before she slips." |
+| 0:36–0:46 | ChatGPT·Claude 동기화 | "We already talk to AI every day. Kinproof shares the dates and plans. Not our worries." |
+| 0:46–0:50 | 할머니 음성 | "My mother doesn't use apps. She just asks." |
+| 0:50–1:15 ⭐ | 복제 음성 → Is this you? → Not me → 차단 | (처음 두 문장은 조용히) "That's my voice. Cloned in one minute. I'm in a meeting, my phone isn't on a call, and I'm in Pangyo, not Busan. So it asks me. I tap Not me. Blocked." |
+| 1:15–1:20 | Home Protector + 로고 | "Everything the family needs, on one screen. Kinproof. A voice isn't proof anymore. Family is." |
 
 ## 화면 조작 순서 (스토리 모드를 쓰면 자동)
 1. Reset → ▶ Story mode (약 85초), 동의 → 로봇 → 물기 → 엄마·아빠·지훈 동기화 → 할머니 음성 → **복제 음성 통화 → 차단** → Home Protector → 야간 드론

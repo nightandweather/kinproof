@@ -729,6 +729,12 @@ function caption(time, text) {
   $('cap-time').textContent = time || ''; $('cap-text').textContent = text;
   el.classList.remove('hidden'); el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
 }
+function slide(html) {
+  const el = $('slide');
+  if (!html) { el.classList.add('hidden'); return; }
+  el.innerHTML = html; el.classList.remove('hidden');
+  el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
+}
 let storyRunning = false;
 async function story() {
   if (storyRunning) return; storyRunning = true;
@@ -736,7 +742,22 @@ async function story() {
   try {
     setView('demo');
     await api('/reset', {}); seenEvents.clear(); seenLines.clear(); lastWikiPageHighlight = 0;
-    caption('', 'Last year millions of SIM records leaked. A phone number can be copied. So can a voice.'); await sleep(3500);
+    caption('', '');
+    slide(`<div class="s-logo">K</div><h1>Kinproof</h1><h2>Family security for the age of voice cloning.<br>It checks that a caller is really your family before anyone sends money.</h2>`);
+    await sleep(5500);
+    slide(`<h2>Voice phishing in Korea, 2025</h2><div class="stats">
+      <div class="stat"><b>₩1.26T</b><span>lost to voice phishing</span></div>
+      <div class="stat"><b>+47%</b><span>vs. the year before</span></div>
+      <div class="stat"><b>₩53.8M</b><span>lost per victim</span></div></div>
+      <div class="src">Police data via National Assembly analysis</div>`);
+    await sleep(6000);
+    slide(`<h2>Older adults are hit hardest</h2><div class="stats">
+      <div class="stat"><b>$7.75B</b><span>lost by people 60+ in the US, 2025</span></div>
+      <div class="stat"><b>+59%</b><span>in one year</span></div></div>
+      <h2>Phone numbers leak. Voices get cloned.<br>And the parent who lives alone is the easiest target.</h2>
+      <div class="src">FBI IC3 2025 Elder Fraud data</div>`);
+    await sleep(6500);
+    slide('');
     caption('', "This is my family. My mother lives alone. My wife is a nurse. My son is 15. I write code in Pangyo."); await sleep(3800);
     caption('08:50', 'We all install Kinproof. It only turns on when everyone says yes.');
     for (const m of ['grandma', 'dad', 'mom', 'jihoon']) { await sleep(450); await api('/consent', { member: m, share: true, onboarding: true }); }
@@ -795,15 +816,11 @@ async function story() {
 
     setView('hub');
     caption('11:05', 'Everything the family needs, on one screen. Every decision is logged.'); await sleep(4000);
-    homeMode = 'out'; render();
-    caption('23:40', '11:40pm. My mother walks out alone. The drone follows her and we can see where she is until she gets home.');
-    $('btn-wander').click(); await sleep(6500);
-    homeMode = 'in';
 
 
     caption('', "Kinproof. A voice isn't proof anymore. Family is."); await sleep(3500);
   } finally {
-    caption('', ''); storyRunning = false; B.textContent = '▶ Story mode';
+    caption('', ''); slide(''); storyRunning = false; B.textContent = '▶ Story mode';
   }
 }
 $('btn-story').onclick = story;

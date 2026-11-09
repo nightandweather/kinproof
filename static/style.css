@@ -547,3 +547,15 @@ body.rec .controls, body.rec .views, body.rec #msg-select{display:none!important
 .caption{top:auto;bottom:14px;max-width:min(1100px,94vw)}
 body.has-cap main.stage, body.has-cap main.hub, body.has-cap main.mapview, body.has-cap main.wikiview, body.has-cap main.communityview{padding-bottom:84px}
 .prompter{bottom:auto;top:110px}
+
+/* full-screen slides for the opening (intro + reality) */
+.slide{position:fixed;inset:0;z-index:44;background:#111;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;animation:fadein .5s ease;padding:40px}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.slide .s-logo{width:84px;height:84px;border-radius:26px;background:var(--mine);color:#191919;display:grid;place-items:center;font-weight:900;font-size:42px}
+.slide h1{font-size:54px;margin:0;letter-spacing:-.03em}
+.slide h2{font-size:28px;margin:0;font-weight:700;color:#dee2e6;max-width:900px;line-height:1.35}
+.slide .stats{display:flex;gap:22px;flex-wrap:wrap;justify-content:center}
+.slide .stat{background:#1e1e1e;border-radius:22px;padding:22px 26px;min-width:230px}
+.slide .stat b{display:block;font-size:46px;font-weight:900;letter-spacing:-.03em;color:var(--mine)}
+.slide .stat span{font-size:15px;color:#adb5bd}
+.slide .src{font-size:12px;color:#6c757d}
