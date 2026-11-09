@@ -786,7 +786,7 @@ async function story() {
       await api('/sync/' + sample, {});
       await waitFor(() => S.approvals.some((a) => a.member === m), 30000); await beat(900);
       for (const a of S.approvals.filter((a) => a.member === m)) { await api('/approvals/' + a.id, { decision: 'approve' }); await beat(200); }
-      await beat(900);
+      await beat(1600);   // → to the next scene
     };
     await syncAndShare('mom', 'mom_chatgpt', ['09:20', "My wife tells ChatGPT about my mother's MRI on Thursday. The date gets shared. Her job stress doesn't."]);
     await syncAndShare('dad', 'dad_chatgpt', ['09:30', "My ChatGPT knows I'm in Pangyo all week. That gets shared. My stock losses don't."]);
