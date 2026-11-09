@@ -764,14 +764,21 @@ async function story() {
 
     caption('11:02', '“Mom, it\'s me, Jun-ho. My phone broke…” — a scammer with my voice, cloned from ten seconds of video.');
     await api('/presence', { member: 'dad', on_call: false });
-    // LIVE: the presenter reads the scammer's lines into the mic; each finalized sentence goes to the guard.
-    script = 'scam'; prompterBase = 0; prompterOpen = true;
-    await api('/call/start', { caller: '010-****-7741' });
-    callListening = true;
-    STT.start({ onFinal: sendUtterance, onInterim: (t) => ($('interim').textContent = t) });
-    caption('11:02', 'Read the lines on screen — in Korean, as the scammer.');
-    await waitFor(() => S.call.transcript.length >= 1, 60000);
-    caption('11:02', 'A scammer with my voice is calling my mother.');
+    // If a voice-clone recording exists, play it (the scammer IS the clone). Otherwise the presenter reads the lines live.
+    const clone = ['scam_clone'].find((r) => S.recordings.includes(r));
+    if (clone) {
+      replay(clone);
+      await waitFor(() => S.call.transcript.length >= 1, 30000);
+      caption('11:02', 'This is my voice — cloned in one minute — calling my mother.');
+    } else {
+      script = 'scam'; prompterBase = 0; prompterOpen = true;
+      await api('/call/start', { caller: '010-****-7741' });
+      callListening = true;
+      STT.start({ onFinal: sendUtterance, onInterim: (t) => ($('interim').textContent = t) });
+      caption('11:02', 'Read the lines on screen — in Korean, as the scammer.');
+      await waitFor(() => S.call.transcript.length >= 1, 60000);
+      caption('11:02', 'A scammer with my voice is calling my mother.');
+    }
     await waitFor(() => S.call.confirm_requested, 60000);
     caption('11:02', "My phone isn't on any call and I'm in a meeting with Do Not Disturb on. Kinproof breaks through DND and asks me: “Is this you?”");
     await waitFor(() => S.call.signals.some((s) => s.type === 'GPS_MISMATCH'), 60000);
@@ -779,7 +786,7 @@ async function story() {
     const lines = (S.scripts || {}).scam || [];
     await waitFor(() => S.call.transcript.length >= lines.length || (S.call.level === 'ALERT' && S.call.transcript.length >= 5), 60000);
     await sleep(1500);
-    STT.stop(); callListening = false; prompterOpen = false; $('interim').textContent = '';
+    if (!clone) { STT.stop(); callListening = false; prompterOpen = false; $('interim').textContent = ''; }
     caption('11:03', 'I tap “Not me”. Blocked. My wife gets the reasons — and a one-tap 112 report.');
     await api('/call/confirm', { member: 'dad', is_me: false }); await sleep(3800);
 
