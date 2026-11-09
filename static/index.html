@@ -4,11 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Kinproof</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 <header class="topbar">
-  <div class="brand"><span class="logo">◆</span> Kinproof <span class="tag">voice isn't proof — family is</span></div>
+  <div class="brand">
+    <div class="logo">K</div>
+    <div><div class="brand-name">Kinproof</div><div class="tag">Voice isn't proof anymore. Family is.</div></div>
+  </div>
+  <nav class="steps" id="steps">
+    <div class="step" data-step="1"><b>1</b>AI chats sync</div>
+    <div class="step" data-step="2"><b>2</b>Family approves</div>
+    <div class="step" data-step="3"><b>3</b>Suspicious call</div>
+    <div class="step" data-step="4"><b>4</b>Real family confirms</div>
+  </nav>
   <div class="controls">
     <span id="mode" class="badge">LIVE</span>
     <button id="btn-call" class="primary">📞 Start live call</button>
@@ -17,73 +27,90 @@
     <button id="btn-reset" class="ghost">Reset</button>
   </div>
 </header>
-<nav class="steps" id="steps">
-  <div class="step" data-step="1"><b>1</b> AI chats sync</div>
-  <div class="step" data-step="2"><b>2</b> Family approves → wiki & reminders</div>
-  <div class="step" data-step="3"><b>3</b> Suspicious call</div>
-  <div class="step" data-step="4"><b>4</b> Real family confirms</div>
-</nav>
 <div id="flash" class="flash"></div>
+<div id="prompter" class="prompter hidden">
+  <div class="prompter-head"><span id="prompter-title">Script</span>
+    <span class="prompter-tabs"><button data-script="scam" class="small">Scammer</button><button data-script="real_jihoon" class="small">Real Ji-hoon</button></span>
+    <button id="prompter-close" class="small ghost">✕</button></div>
+  <div id="prompter-lines" class="prompter-lines"></div>
+</div>
 
-<main class="grid">
+<main class="stage">
   <!-- Grandma -->
   <section class="phone" id="p-grandma">
-    <div class="phone-head"><span class="who">👵 Grandma</span><span class="sub">protected</span></div>
-    <div id="call-card" class="call idle">
-      <div class="call-top">
-        <div><div class="caller" id="caller">No active call</div><div class="claimed" id="claimed"></div></div>
-        <div class="meter"><div class="meter-num" id="score">0</div><div class="meter-lvl" id="level">SAFE</div></div>
+    <div class="statusbar"><span>9:41</span><span class="notch"></span><span>5G ▮▮▮</span></div>
+    <div class="room-head"><span class="back">‹</span><div class="room-title">👵 Grandma <span class="room-sub">protected · 김순자, 78</span></div><span class="menu">≡</span></div>
+    <div class="room">
+      <div id="mysched-grandma" class="mysched"></div>
+      <div id="call-card" class="call idle">
+        <div class="call-row">
+          <div class="caller-avatar" id="caller-avatar">?</div>
+          <div class="caller-info"><div class="caller" id="caller">No active call</div><div class="claimed" id="claimed"></div></div>
+          <div class="gauge">
+            <svg viewBox="0 0 64 64"><circle class="track" cx="32" cy="32" r="27"/><circle id="gauge-arc" class="arc" cx="32" cy="32" r="27"/></svg>
+            <div class="gauge-num" id="score">0</div>
+          </div>
+        </div>
+        <div class="level-row"><span id="level" class="level-pill SAFE">SAFE</span><span id="busy" class="busy"></span></div>
+        <div id="verdict" class="verdict hidden"></div>
       </div>
-      <div class="bar"><div id="bar-fill"></div></div>
-      <div id="verdict" class="verdict hidden"></div>
       <div id="transcript" class="transcript"></div>
       <div id="interim" class="interim"></div>
+      <div class="divider"><span>Evidence · model extracts, code verifies &amp; scores</span></div>
+      <div id="signals" class="signals"></div>
+      <div id="dropped" class="dropped"></div>
+      <div id="feed-grandma" class="feed"></div>
     </div>
-    <div class="section-label">Evidence <span class="hint">model extracts · code verifies · code scores</span></div>
-    <div id="signals" class="signals"></div>
-    <div id="dropped" class="dropped"></div>
-    <div class="actions">
-      <button id="btn-voice-plan">🎤 Tell Kinproof a plan</button>
-    </div>
-    <div id="feed-grandma" class="feed"></div>
+    <div class="composer"><button id="btn-voice-plan" class="mic">🎤</button><div class="composer-input">Tell Kinproof a plan by voice…</div></div>
   </section>
 
   <!-- Mom -->
   <section class="phone" id="p-mom">
-    <div class="phone-head"><span class="who">👩 Mom</span><span class="sub">caregiver</span></div>
-    <div class="actions"><button data-sync="mom_chatgpt">↻ Sync ChatGPT</button></div>
-    <div id="approvals-mom" class="approvals"></div>
-    <div id="feed-mom" class="feed"></div>
+    <div class="statusbar"><span>9:41</span><span class="notch"></span><span>5G ▮▮▮</span></div>
+    <div class="room-head"><span class="back">‹</span><div class="room-title">👩 Mom <span class="room-sub">caregiver · ChatGPT</span></div><span class="menu">≡</span></div>
+    <div class="room">
+      <div id="mysched-mom" class="mysched"></div>
+      <div class="sys">Kinproof syncs facts from your ChatGPT — never the chat itself.</div>
+      <div id="approvals-mom" class="approvals"></div>
+      <div id="feed-mom" class="feed"></div>
+    </div>
+    <div class="composer"><button class="sync" data-sync="mom_chatgpt">↻ Sync ChatGPT</button></div>
   </section>
 
   <!-- Ji-hoon -->
   <section class="phone" id="p-jihoon">
-    <div class="phone-head"><span class="who">👨 Ji-hoon</span><span class="sub">grandson</span></div>
-    <div class="presence">
-      <span id="presence-label">📵 Not on a call</span>
-      <button id="btn-presence" class="ghost small">toggle</button>
+    <div class="statusbar"><span>9:41</span><span class="notch"></span><span>5G ▮▮▮</span></div>
+    <div class="room-head"><span class="back">‹</span><div class="room-title">👨 Ji-hoon <span class="room-sub">grandson · Claude</span></div><span class="menu">≡</span></div>
+    <div class="room">
+      <div class="presence"><span id="presence-label">📵 Not on a call</span><button id="btn-presence" class="ghost small">toggle</button></div>
+      <div id="mysched-jihoon" class="mysched"></div>
+      <div id="approvals-jihoon" class="approvals"></div>
+      <div id="feed-jihoon" class="feed"></div>
     </div>
+    <div class="composer"><button class="sync" data-sync="jihoon_claude">↻ Sync Claude</button></div>
     <div id="confirm-box" class="confirm hidden">
+      <div class="confirm-icon">⚠️</div>
+      <div class="confirm-title">Is this you?</div>
       <div class="confirm-text" id="confirm-text"></div>
       <div class="confirm-btns">
+        <button id="btn-not-me" class="danger">Not me — block it</button>
         <button id="btn-its-me" class="ok">It's me</button>
-        <button id="btn-not-me" class="danger">Not me</button>
       </div>
     </div>
-    <div class="actions"><button data-sync="jihoon_claude">↻ Sync Claude</button></div>
-    <div id="approvals-jihoon" class="approvals"></div>
-    <div id="feed-jihoon" class="feed"></div>
   </section>
 
   <!-- Wiki -->
-  <section class="wiki" id="p-wiki">
-    <div class="phone-head"><span class="who">📚 Family Wiki</span><span class="sub">approved facts only</span></div>
+  <section class="doc" id="p-wiki">
+    <div class="doc-head"><div class="doc-title">📚 Family Wiki</div><div class="doc-sub">approved facts only · plain markdown</div></div>
+    <div class="cal-head"><span id="cal-title">This week</span>
+      <span id="cal-filter" class="cal-filter">
+        <button data-who="all" class="on">All</button><button data-who="grandma"><i class="o-grandma"></i>Grandma</button><button data-who="mom"><i class="o-mom"></i>Mom</button><button data-who="jihoon"><i class="o-jihoon"></i>Ji-hoon</button>
+      </span></div>
+    <div id="calendar" class="calendar"></div>
+    <div id="agenda" class="agenda"></div>
     <div id="wiki-tabs" class="tabs"></div>
-    <pre id="wiki-body" class="wiki-body"></pre>
-    <div class="section-label">Schedule</div>
-    <div id="events" class="events"></div>
-    <div class="section-label">Sync log</div>
-    <div id="log" class="log"></div>
+    <div id="wiki-body" class="wiki-body"></div>
+    <details class="log-wrap"><summary>Sync log</summary><div id="log" class="log"></div></details>
   </section>
 </main>
 

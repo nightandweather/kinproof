@@ -1,6 +1,7 @@
 """Kinproof server. Run: uvicorn server:app --port 8000"""
 import asyncio
 import json
+import re
 import time
 from contextlib import asynccontextmanager
 
@@ -67,6 +68,11 @@ def get_state():
     s = state.snapshot()
     s["recordings"] = sorted(p.stem for p in config.RECORDINGS_DIR.glob("*.json"))
     s["samples"] = sorted(p.stem for p in config.SAMPLES_DIR.glob("*.md"))
+    s["scripts"] = {
+        p.stem.replace("_ko", ""): [re.sub(r"\[\[.*?\]\]", "", line).strip()
+                                    for line in p.read_text(encoding="utf-8").splitlines() if line.strip()]
+        for p in (config.ROOT / "data" / "scenarios").glob("*.txt")
+    }
     return s
 
 

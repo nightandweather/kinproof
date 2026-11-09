@@ -1,0 +1,15 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "claimed_identity": "jihoon",
+  "signals": [
+   {
+    "type": "CHANNEL_SWITCH",
+    "quote": "폰이 깨져서 친구 폰으로 전화했어.",
+    "quote_en": "My phone broke, so I'm calling from a friend's phone.",
+    "wiki_page": null,
+    "wiki_quote": null
+   }
+  ]
+ }
+}
