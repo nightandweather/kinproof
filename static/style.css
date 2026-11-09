@@ -567,3 +567,21 @@ body.has-cap main.stage, body.has-cap main.hub, body.has-cap main.mapview, body.
 .gm-said small{display:block;font-size:12px;font-weight:600;color:#5c4a00;margin-top:3px}
 .gm-said .mic{font-size:13px;font-weight:800;color:#7c5e00;display:block;margin-bottom:3px}
 .hev.just{box-shadow:0 0 0 4px #fee500,0 10px 24px #0003;transform:scale(1.04)}
+
+/* spotlight: what the presenter is talking about */
+.spot-dim{position:fixed;inset:0;background:#0007;z-index:30;pointer-events:none;transition:opacity .3s}
+.spotted{position:relative;z-index:31!important;box-shadow:0 0 0 5px #fee500,0 0 0 9999px #0000,0 20px 50px #0006!important;border-radius:28px;transition:box-shadow .3s}
+.spot-label{position:fixed;z-index:32;background:#fee500;color:#191919;font-weight:900;font-size:17px;border-radius:12px;padding:7px 13px;box-shadow:0 8px 20px #0004;pointer-events:none;animation:pop .3s ease;white-space:nowrap}
+
+/* enlarged robot photos sent to the caregiver */
+.photozoom{position:fixed;inset:0;z-index:40;background:#000a;display:flex;align-items:center;justify-content:center;animation:fadein .35s ease}
+.pz-card{background:#fff;border-radius:26px;padding:20px 22px;box-shadow:0 30px 80px #0008;max-width:min(1200px,92vw)}
+.pz-head{display:flex;align-items:center;gap:10px;font-weight:900;font-size:20px;margin-bottom:14px}
+.pz-head .k{width:34px;height:34px;border-radius:11px;background:var(--mine);display:grid;place-items:center}
+.pz-head small{font-weight:600;color:var(--dim);font-size:14px;margin-left:auto}
+.pz-imgs{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pz-imgs figure{margin:0;position:relative;border-radius:16px;overflow:hidden}
+.pz-imgs img{width:100%;display:block;aspect-ratio:3/2;object-fit:cover}
+.pz-imgs figcaption{position:absolute;left:12px;top:12px;background:#000b;color:#fff;font-weight:900;font-size:16px;border-radius:99px;padding:4px 12px}
+.pz-imgs figcaption.after{background:#12b886}
+.pz-note{margin-top:12px;font-size:14px;color:var(--dim)}

@@ -740,6 +740,29 @@ function beat(ms) {
   if (!PACED || ms < 1500) return sleep(ms);
   return sleep(600).then(() => new Promise((r) => { advance = r; }));
 }
+function spot(sel, label) {
+  document.querySelectorAll('.spotted').forEach((e) => e.classList.remove('spotted'));
+  const dim = $('spot-dim'), lab = $('spot-label');
+  if (!sel) { dim.classList.add('hidden'); lab.classList.add('hidden'); return; }
+  const el = document.querySelector(sel);
+  if (!el) return;
+  el.classList.add('spotted'); dim.classList.remove('hidden');
+  if (label) {
+    const r = el.getBoundingClientRect();
+    lab.textContent = label; lab.classList.remove('hidden');
+    lab.style.left = Math.max(12, Math.min(window.innerWidth - 420, r.left + 12)) + 'px';
+    lab.style.top = Math.max(8, r.top - 44) + 'px';
+  } else lab.classList.add('hidden');
+}
+function photoZoom(show) {
+  const el = $('photozoom');
+  if (!show) { el.classList.add('hidden'); return; }
+  el.innerHTML = `<div class="pz-card"><div class="pz-head"><span class="k">K</span>Sent to my wife's phone<small>robot camera · kitchen · simulated</small></div>
+    <div class="pz-imgs"><figure><img src="/static/img/spill_before.jpg"><figcaption>Before · water on the floor</figcaption></figure>
+    <figure><img src="/static/img/spill_after.jpg"><figcaption class="after">After · dry, fall risk gone</figcaption></figure></div>
+    <div class="pz-note">Grandma was warned by the speaker first: “주방 바닥에 물이 있어요. 미끄러우니 조심하세요.”</div></div>`;
+  el.classList.remove('hidden');
+}
 function slide(html) {
   const el = $('slide');
   if (!html) { el.classList.add('hidden'); return; }
@@ -750,18 +773,20 @@ async function grandmaVoiceScene() {
   const said = '수요일 오후 3시에 내과 가서 감기약 타 올 거야';
   const el = $('gm-said');
   setView('demo');
-  caption('10:10', "My mother doesn't do apps. She just talks.");
+  spot('#p-grandma', "Mom's phone: she just talks");
+  caption('10:10', "My mom doesn't do apps. She just says it out loud…");
   el.innerHTML = `<span class="mic">🎤 Grandma says</span>${esc(said)}<small>“I'm going to the clinic Wednesday at 3 to get cold medicine.”</small>`;
   el.classList.remove('hidden');
   const before = new Set(S.events.map((e) => e.id));
   await api('/voice', { member: 'grandma', text: said });
   await waitFor(() => S.events.some((e) => !before.has(e.id)), 20000);
-  caption('10:10', 'Kinproof understands her, puts it on the family calendar, and tells my wife and me.');
+  caption('10:10', '…and it lands on the family calendar, and we all get a heads-up.');
   await beat(4000);
   el.classList.add('hidden');
   setView('hub'); calMode = 'week';
   window.__justEvent = S.events.find((e) => !before.has(e.id))?.id;
-  caption('10:11', 'There it is. Wednesday, 3pm. Nobody had to type anything.');
+  spot('.h-cal', 'Family calendar: added automatically');
+  caption('10:11', 'See? Wednesday, 3pm. Nobody typed a thing.');
   await beat(4000);
   window.__justEvent = null;
 }
@@ -772,17 +797,17 @@ async function story() {
   try {
     setView('demo');
     await api('/reset', {}); seenEvents.clear(); seenLines.clear(); lastWikiPageHighlight = 0;
-    caption('', "Hi, I'm Kanghoun. This is Kinproof. It makes sure a caller is really your family, before anyone sends money.");
+    caption('', "Hi, I'm Kanghoun. Quick question: if your mom got a call from “you” asking for money, would she know it wasn't you? That's what Kinproof is for.");
     slide(`<div class="s-logo">K</div><h1>Kinproof</h1><h2>Family security for the age of voice cloning.<br>It checks that a caller is really your family before anyone sends money.</h2>`);
     await beat(5500);
-    caption('', 'Last year, Koreans lost 1.26 trillion won to voice phishing. That\'s up 47 percent.');
+    caption('', 'In Korea last year, people lost 1.26 trillion won to voice phishing. That\'s up almost half.');
     slide(`<h2>Voice phishing in Korea, 2025</h2><div class="stats">
       <div class="stat"><b>₩1.26T</b><span>lost to voice phishing</span></div>
       <div class="stat"><b>+47%</b><span>vs. the year before</span></div>
       <div class="stat"><b>₩53.8M</b><span>lost per victim</span></div></div>
       <div class="src">Police data via National Assembly analysis</div>`);
     await beat(6000);
-    caption('', 'Older people are hit the hardest. Phone numbers leak, voices get cloned, and a parent living alone is the easiest target.');
+    caption('', 'And it\'s mostly our parents. Numbers leak, voices get cloned, and a parent living alone is the easy target.');
     slide(`<h2>Older adults are hit hardest</h2><div class="stats">
       <div class="stat"><b>$7.75B</b><span>lost by people 60+ in the US, 2025</span></div>
       <div class="stat"><b>+59%</b><span>in one year</span></div></div>
@@ -790,16 +815,20 @@ async function story() {
       <div class="src">FBI IC3 2025 Elder Fraud data</div>`);
     await beat(6500);
     slide('');
-    caption('', "This is my family. My mother lives alone. My wife is a nurse. My son is 15. I write code in Pangyo."); await beat(3800);
-    caption('08:50', 'We all install Kinproof. It only turns on when everyone says yes.');
+    caption('', "So here's my family. My mom lives alone, my son's fifteen, and I'm the one writing code in Pangyo."); await beat(3800);
+    caption('08:50', 'We all installed Kinproof. It only turns on once everyone says yes.');
     for (const m of ['grandma', 'dad', 'mom', 'jihoon']) { await beat(450); await api('/consent', { member: m, share: true, onboarding: true }); }
     await beat(1500);
 
     setView('hub'); homeMode = 'in';
-    caption('09:00', "9am. The robot brings my mother her blood pressure pills and a glass of water.");
+    spot('.h-yard', "Mom's apartment (simulated robot)");
+    caption('09:00', "Mornings, a little robot brings my mom her pills and a glass of water…");
     $('btn-med').click(); await beat(6500);
-    caption('10:40', 'Water on the kitchen floor. The robot warns her, wipes it up, and sends my wife a photo.');
-    $('btn-spill').click(); await beat(5600);
+    caption('10:40', '…and if there\'s water on the floor, it wipes it up before she slips, and sends my wife a photo.');
+    $('btn-spill').click(); await sleep(5800);
+    spot(null); photoZoom(true);
+    await beat(4000);
+    photoZoom(false);
 
     setView('demo');
     const syncAndShare = async (m, sample, line) => {
@@ -809,11 +838,16 @@ async function story() {
       for (const a of S.approvals.filter((a) => a.member === m)) { await api('/approvals/' + a.id, { decision: 'approve' }); await beat(200); }
       await beat(1600);   // → to the next scene
     };
-    await syncAndShare('mom', 'mom_chatgpt', ['09:20', "My wife tells ChatGPT about my mother's MRI on Thursday. The date gets shared. Her job stress doesn't."]);
-    await syncAndShare('dad', 'dad_chatgpt', ['09:30', "My ChatGPT knows I'm in Pangyo all week. That gets shared. My stock losses don't."]);
-    await syncAndShare('jihoon', 'jihoon_claude', ['09:35', "Ji-hoon's hagwon schedule gets shared. His crush stays private."]);
+    spot('#p-mom', "My wife's phone: ChatGPT → family wiki");
+    await syncAndShare('mom', 'mom_chatgpt', ['09:20', "We already tell ChatGPT everything. Kinproof picks up just the family stuff, like my mom's MRI. Not my wife's job stress."]);
+    spot('#p-dad', 'My phone');
+    await syncAndShare('dad', 'dad_chatgpt', ['09:30', "Same with mine. My week in Pangyo, yes. My stock losses, no."]);
+    spot('#p-jihoon', "My son's phone");
+    await syncAndShare('jihoon', 'jihoon_claude', ['09:35', "And my son's hagwon schedule. His crush stays his business."]);
+    spot(null);
 
     await grandmaVoiceScene();
+    spot(null);
     setView('demo');
 
     caption('11:02', '11am. “Mom, it\'s Jun-ho. My phone broke…”');
@@ -823,7 +857,8 @@ async function story() {
     if (clone) {
       replay(clone);
       await waitFor(() => S.call.transcript.length >= 1, 30000);
-      caption('11:02', 'That\'s my voice. Cloned in one minute.');
+      spot('#p-grandma', "Mom's phone: incoming call");
+      caption('11:02', 'Now the scary part. That\'s my voice. Cloned in one minute.');
     } else {
       script = 'scam'; prompterBase = 0; prompterOpen = true;
       await api('/call/start', { caller: '010-****-7741' });
@@ -834,23 +869,27 @@ async function story() {
       caption('11:02', 'Someone is calling my mother with my voice.');
     }
     await waitFor(() => S.call.confirm_requested, 60000);
-    caption('11:02', "I'm in a meeting. My phone is on silent and not on any call. So Kinproof asks me directly: is this you?");
+    spot('#p-dad', 'My phone: “Is this you?”');
+    caption('11:02', "But I'm in a meeting, and my phone isn't even on a call. So it asks me.");
     await waitFor(() => S.call.signals.some((s) => s.type === 'GPS_MISMATCH'), 60000);
-    caption('11:03', 'He says he\'s in Busan. My phone is in Pangyo.');
+    caption('11:03', 'He says he\'s in Busan. My phone says Pangyo.');
     const lines = (S.scripts || {}).scam || [];
     await waitFor(() => S.call.transcript.length >= lines.length || (S.call.level === 'ALERT' && S.call.transcript.length >= 5), 60000);
     await beat(1500);
     if (!clone) { STT.stop(); callListening = false; prompterOpen = false; $('interim').textContent = ''; }
-    caption('11:03', 'I tap Not me. The call is blocked. My wife sees why, and can report it to 112 in one tap.');
+    spot('#p-grandma', 'Blocked, with the reasons');
+    caption('11:03', 'Not me. Blocked. And my wife can report it to 112 in one tap.');
     await api('/call/confirm', { member: 'dad', is_me: false }); await beat(3800);
 
     setView('hub');
-    caption('11:05', 'Everything the family needs, on one screen. Every decision is logged.'); await beat(4000);
+    spot('.h-log', 'Every decision, logged');
+    caption('11:05', "Everything's in one place, and you can see every call it made."); await beat(4000);
+    spot(null);
 
 
-    caption('', "Kinproof. A voice isn't proof anymore. Family is."); await beat(3500);
+    caption('', "Kinproof. A voice isn't proof anymore. Your family is."); await beat(3500);
   } finally {
-    caption('', ''); slide(''); storyRunning = false; B.textContent = '▶ Story mode';
+    caption('', ''); slide(''); spot(null); photoZoom(false); storyRunning = false; B.textContent = '▶ Story mode';
   }
 }
 $('btn-story').onclick = story;
@@ -1002,7 +1041,7 @@ document.addEventListener('click', async (e) => {
     if (scene === 'voice') { $('rg-count').textContent = '…'; await prepareScene(); }
     for (const n of [3, 2, 1]) { $('rg-count').textContent = n; await sleep(800); }
     gate.classList.add('hidden');
-    if (scene === 'voice') { await grandmaVoiceScene(); caption('', ''); return; }
+    if (scene === 'voice') { await grandmaVoiceScene(); spot(null); caption('', ''); return; }
     story();
   };
   $('rg-start').onclick = go;   // the click also unlocks audio playback for the cloned call

@@ -1,0 +1,25 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "kept_private": [],
+  "facts": [],
+  "events": [
+   {
+    "title": "내과 방문 및 감기약 처방",
+    "date": "2026-11-11",
+    "time": "15:00",
+    "owner": "grandma",
+    "involves": [
+     "grandma"
+    ],
+    "notify": [
+     {
+      "member": "mom",
+      "message": "엄마, 할머니가 수요일 오후 3시에 내과에 가서 감기약을 받아 오실 예정이에요."
+     }
+    ],
+    "source_quote": "수요일 오후 3시에 내과 가서 감기약 타 올 거야"
+   }
+  ]
+ }
+}

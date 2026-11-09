@@ -1,0 +1,9 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "intent": "add_plan",
+  "target": null,
+  "message": null,
+  "reply": "11월 11일 수요일 오후 3시에 내과에 가셔서 감기약을 받아 오실 예정이시군요."
+ }
+}
