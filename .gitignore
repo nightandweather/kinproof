@@ -7,3 +7,6 @@ inbox/*.md
 inbox/processed/*.md
 *.aiff
 .DS_Store
+
+# presenter's cloned voice — keep out of the (soon public) repo
+static/audio/*.mp3
