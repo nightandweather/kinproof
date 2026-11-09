@@ -1,0 +1,9 @@
+[
+  {"title": "가족회의 (영상통화)", "date": "2026-11-09", "time": "20:30", "owner": "dad", "involves": ["grandma", "mom", "jihoon"], "emoji": "👨‍👩‍👦", "source": "dad · ChatGPT"},
+  {"title": "할머니 혈압약 체크", "date": "2026-11-10", "time": "09:00", "owner": "mom", "involves": ["grandma"], "emoji": "💊", "source": "mom · ChatGPT"},
+  {"title": "엄마 요가", "date": "2026-11-11", "time": "19:00", "owner": "mom", "involves": [], "emoji": "🧘", "source": "mom · ChatGPT"},
+  {"title": "경로당 노래교실", "date": "2026-11-11", "time": "14:00", "owner": "grandma", "involves": [], "emoji": "🎤", "source": "grandma · voice"},
+  {"title": "고메스퀘어 가족 저녁", "date": "2026-11-13", "time": "19:00", "owner": "dad", "involves": ["grandma", "mom", "jihoon"], "emoji": "🍽", "source": "dad · ChatGPT"},
+  {"title": "할머니 교회", "date": "2026-11-15", "time": "10:30", "owner": "grandma", "involves": [], "emoji": "⛪", "source": "grandma · voice"},
+  {"title": "아빠 골프", "date": "2026-11-15", "time": "07:00", "owner": "dad", "involves": [], "emoji": "⛳", "source": "dad · ChatGPT"}
+]

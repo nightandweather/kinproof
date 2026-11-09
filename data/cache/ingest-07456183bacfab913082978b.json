@@ -1,0 +1,60 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "kept_private": [
+   "연애 선물",
+   "코드 오류"
+  ],
+  "facts": [
+   {
+    "about": "jihoon",
+    "text": "이번 주 월요일부터 금요일까지 강남 사무실로 출근한다.",
+    "source_quote": "월요일부터 금요일까지 강남 사무실 출근이고"
+   },
+   {
+    "about": "grandma",
+    "text": "무릎이 좋지 않다.",
+    "source_quote": "할머니 무릎 안 좋으시니까"
+   }
+  ],
+  "events": [
+   {
+    "title": "팀 회식",
+    "date": "2026-11-12",
+    "time": "19:00",
+    "owner": "jihoon",
+    "involves": [
+     "jihoon"
+    ],
+    "notify": [
+     {
+      "member": "mom",
+      "message": "엄마, 지훈이 목요일 저녁 7시에 팀 회식이 있어요."
+     }
+    ],
+    "source_quote": "목요일 저녁 7시에 팀 회식 있어."
+   },
+   {
+    "title": "할머니 댁 방문",
+    "date": "2026-11-14",
+    "time": null,
+    "owner": "jihoon",
+    "involves": [
+     "jihoon",
+     "grandma"
+    ],
+    "notify": [
+     {
+      "member": "grandma",
+      "message": "할머니, 지훈이가 토요일 오후에 찾아뵙기로 했어요."
+     },
+     {
+      "member": "mom",
+      "message": "엄마, 지훈이가 토요일 오후에 할머니 댁에 가기로 했어요."
+     }
+    ],
+    "source_quote": "토요일 오후엔 할머니 댁 가기로 했어."
+   }
+  ]
+ }
+}

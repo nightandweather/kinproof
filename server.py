@@ -54,6 +54,35 @@ class Confirm(BaseModel):
     is_me: bool
 
 
+class MemberIn(BaseModel):
+    name_en: str
+    name: str = ""
+    emoji: str = "🙂"
+    gps: str = ""
+    role: str = "family"
+
+
+class Motion(BaseModel):
+    zone: str = "back fence"
+    known: bool | None = None
+
+
+class Consent(BaseModel):
+    member: str
+    share: bool
+    onboarding: bool = False
+
+
+class VoiceIn(BaseModel):
+    member: str = "grandma"
+    text: str
+
+
+class RobotStep(BaseModel):
+    stage: str          # start | water | pills | deliver | taken | no_answer | docked
+    med: str = "혈압약"
+
+
 class CallEnd(BaseModel):
     save_as: str | None = None
 
@@ -115,9 +144,127 @@ def event_done(event_id: str):
     with state.LOCK:
         for ev in state.S["events"]:
             if ev["id"] == event_id:
-                ev["done"] = True
+                ev["done"] = not ev.get("done")
                 return {"ok": True}
     raise HTTPException(404, event_id)
+
+
+@app.post("/api/notifications/{nid}/done")
+def notification_done(nid: str):
+    with state.LOCK:
+        for n in state.S["notifications"]:
+            if n["id"] == nid:
+                n["done"] = not n.get("done")
+                return {"ok": True}
+    raise HTTPException(404, nid)
+
+
+@app.post("/api/members")
+def add_member(body: MemberIn):
+    """Add a family member to the hub (display + schedule; call claims use the configured roster)."""
+    mid = "".join(ch for ch in body.name_en.lower() if ch.isalnum()) or state.new_id("m")
+    with state.LOCK:
+        if mid in state.S["members"]:
+            raise HTTPException(409, mid)
+        state.S["members"][mid] = {"name": body.name or body.name_en, "name_en": body.name_en, "emoji": body.emoji,
+                                   "gps": body.gps, "role": body.role, "on_call": False}
+        state.S["wiki"].setdefault(mid, f"# {body.name or body.name_en}\n")
+    state.log(f"added family member {body.name_en} — wiki/{mid}.md created", "wiki")
+    return {"id": mid}
+
+
+@app.post("/api/perimeter")
+def perimeter(body: Motion):
+    """SIMULATED yard sensor + drone. known=None: motion detected -> dispatch; known=True/False: drone result."""
+    g = config.MEMBERS[config.PROTECTED]["name_en"]
+    with state.LOCK:
+        per = state.S["perimeter"]
+        if body.known is None:
+            per.update(zone=body.zone, status="dispatched", ts=state.now(), known=None)
+            state.log(f"motion near {g}'s {body.zone} → drone dispatched (simulated sensor)", "drone")
+        else:
+            per.update(status="identified", known=body.known)
+            if body.known:
+                state.log(f"drone: person at {body.zone} matches family → no alert", "drone")
+            else:
+                state.log(f"drone: unknown person at {body.zone} → snapshot sent to {config.CAREGIVER}", "drone")
+                state.notify(config.CAREGIVER, "alert", f"🚁 {g} 댁 {body.zone}에 모르는 사람이 있어요. 드론 사진을 보냈어요.")
+    return {"ok": True}
+
+
+@app.post("/api/perimeter/dock")
+def perimeter_dock():
+    with state.LOCK:
+        state.S["perimeter"].update(zone=None, status="docked", known=None)
+    return {"ok": True}
+
+
+@app.post("/api/consent")
+def consent(body: Consent):
+    """Location sharing with the family admin. The map unlocks only when every member agrees."""
+    _member(body.member)
+    with state.LOCK:
+        state.S["members"][body.member]["share_location"] = body.share
+        if body.onboarding:
+            state.S["members"][body.member]["consented"] = body.share
+        ms = state.S["members"]
+        if body.onboarding:
+            ready = sum(1 for v in ms.values() if v.get("consented"))
+            state.log(f"{ms[body.member]['name_en']} installed Kinproof and agreed: AI-chat facts (with approval), call status, location · {ready}/{len(ms)}", "privacy")
+            if ready == len(ms):
+                state.log("everyone agreed → family protection is ON", "privacy")
+        n = sum(1 for v in ms.values() if v.get("share_location"))
+        admin = ms[config.ADMIN]["name_en"]
+        state.log(f"{ms[body.member]['name_en']} {'agreed to share' if body.share else 'stopped sharing'} location with {admin} (admin) · {n}/{len(ms)}", "privacy")
+        if n == len(ms):
+            state.log(f"all {n} members consented → family map unlocked for {admin}", "privacy")
+    return {"ok": True}
+
+
+@app.post("/api/topics/{tid}/share")
+def share_topic(tid: str):
+    """The member — not the admin — decides whether a kept-private topic label is visible to the admin."""
+    with state.LOCK:
+        for pt in state.S["private_topics"]:
+            if pt["id"] == tid:
+                pt["shared"] = not pt["shared"]
+                who = config.MEMBERS.get(pt["member"], {}).get("name_en", pt["member"])
+                state.log(f"{who} {'shared' if pt['shared'] else 'un-shared'} topic label '{pt['topic']}' with admin", "privacy")
+                return {"ok": True}
+    raise HTTPException(404, tid)
+
+
+@app.post("/api/voice")
+def voice(body: VoiceIn):
+    _member(body.member)
+    return ingest.voice(body.member, body.text)
+
+
+@app.post("/api/robot")
+def robot(body: RobotStep):
+    """SIMULATED home robot: brings water + the right pill pouch at medication time, confirms, reports to family."""
+    g = config.MEMBERS[config.PROTECTED]["name"]
+    msgs = {
+        "start": (f"💊 {body.med} 시간 → home robot started (from family schedule)", None),
+        "water": ("robot: picked up a cup of water in the kitchen", None),
+        "pills": (f"robot: picked the {body.med} pouch for today (morning slot)", None),
+        "deliver": (f"robot: delivered water + {body.med} to {g} in the living room · asked “약 드셨어요?”",
+                    (config.PROTECTED, "reminder", f"{g}, {body.med} 드실 시간이에요. 물이랑 약 가져왔어요.")),
+        "taken": (f"{g} said she took it → logged, caregiver notified",
+                  (config.CAREGIVER, "info", f"{g} {body.med} 복용 완료 ✓ (로봇 확인 {state.now()[:5]})")),
+        "no_answer": (f"no answer from {g} for 10 min → escalated to caregiver",
+                      (config.CAREGIVER, "alert", f"{g}께서 {body.med}에 응답이 없어요. 전화 한번 드려 보세요.")),
+        "docked": ("robot: back on the charging dock", None),
+    }
+    if body.stage not in msgs:
+        raise HTTPException(400, body.stage)
+    text, note = msgs[body.stage]
+    with state.LOCK:
+        state.S["robot"].update(stage=body.stage, med=body.med, ts=state.now())
+    state.log(text, "robot")
+    if note:
+        state.notify(*note)
+    return {"ok": True}
 
 
 @app.post("/api/call/start")

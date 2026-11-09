@@ -5,13 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Kinproof</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 <header class="topbar">
   <div class="brand">
     <div class="logo">K</div>
-    <div><div class="brand-name">Kinproof</div><div class="tag">Voice isn't proof anymore. Family is.</div></div>
+    <div><div class="brand-name">Kinproof</div><div class="tag">Home Protector · voice isn't proof anymore</div></div>
   </div>
   <nav class="steps" id="steps">
     <div class="step" data-step="1"><b>1</b>AI chats sync</div>
@@ -19,6 +20,7 @@
     <div class="step" data-step="3"><b>3</b>Suspicious call</div>
     <div class="step" data-step="4"><b>4</b>Real family confirms</div>
   </nav>
+  <div class="views"><button data-view="demo" class="on">📱 Live demo</button><button data-view="hub">🏠 Home Protector</button><button data-view="map">🗺 Map</button><button data-view="wiki">📚 Wiki</button></div>
   <div class="controls">
     <span id="mode" class="badge">LIVE</span>
     <button id="btn-call" class="primary">📞 Start live call</button>
@@ -39,7 +41,7 @@
   <!-- Grandma -->
   <section class="phone" id="p-grandma">
     <div class="statusbar"><span>9:41</span><span class="notch"></span><span>5G ▮▮▮</span></div>
-    <div class="room-head"><span class="back">‹</span><div class="room-title">👵 Grandma <span class="room-sub">protected · 김순자, 78</span></div><span class="menu">≡</span></div>
+    <div class="room-head"><span class="back">‹</span><div class="room-title">👵 Grandma's phone <span class="room-sub">protected · 78</span></div><span class="menu">≡</span></div>
     <div class="room">
       <div id="mysched-grandma" class="mysched"></div>
       <div id="call-card" class="call idle">
@@ -52,8 +54,10 @@
           </div>
         </div>
         <div class="level-row"><span id="level" class="level-pill SAFE">SAFE</span><span id="busy" class="busy"></span></div>
+        <div id="idcheck" class="idcheck hidden"></div>
         <div id="verdict" class="verdict hidden"></div>
       </div>
+      <div id="reason"></div>
       <div id="transcript" class="transcript"></div>
       <div id="interim" class="interim"></div>
       <div class="divider"><span>Evidence · model extracts, code verifies &amp; scores</span></div>
@@ -61,30 +65,52 @@
       <div id="dropped" class="dropped"></div>
       <div id="feed-grandma" class="feed"></div>
     </div>
-    <div class="composer"><button id="btn-voice-plan" class="mic">🎤</button><div class="composer-input">Tell Kinproof a plan by voice…</div></div>
+    <div class="composer"><button id="btn-voice-plan" class="bigmic">🎤 할머니, 말로 하세요</button></div>
+    <div class="onboard" id="onboard-grandma">
+      <div class="ob-logo">K</div>
+      <div class="ob-title">Kinproof</div>
+      <div class="ob-sub">Grandma's phone · family protection</div>
+      <div class="ob-perm"><span>💬</span><div><b>Facts from your voice notes</b><small>only what you approve · never the chat</small></div></div>
+      <div class="ob-perm"><span>📞</span><div><b>“On a call?” status</b><small>yes/no only, to catch impersonation</small></div></div>
+      <div class="ob-perm"><span>📍</span><div><b>Location</b><small>scam checks see “match / no match”; map only if everyone agrees</small></div></div>
+      <button class="ob-btn" data-onboard="grandma">Agree &amp; join family</button>
+      <div class="ob-wait" id="ob-wait-grandma"></div>
+    </div>
   </section>
 
   <!-- Mom -->
   <section class="phone" id="p-mom">
     <div class="statusbar"><span>9:41</span><span class="notch"></span><span>5G ▮▮▮</span></div>
-    <div class="room-head"><span class="back">‹</span><div class="room-title">👩 Mom <span class="room-sub">caregiver · ChatGPT</span></div><span class="menu">≡</span></div>
+    <div class="room-head"><span class="back">‹</span><div class="room-title">👩 Mom's phone <span class="room-sub">caregiver · ChatGPT</span></div><span class="menu">≡</span></div>
     <div class="room">
       <div id="mysched-mom" class="mysched"></div>
       <div class="sys">Kinproof syncs facts from your ChatGPT — never the chat itself.</div>
       <div id="approvals-mom" class="approvals"></div>
+      <div id="private-mom" class="private"></div>
       <div id="feed-mom" class="feed"></div>
     </div>
     <div class="composer"><button class="sync" data-sync="mom_chatgpt">↻ Sync ChatGPT</button></div>
+    <div class="onboard" id="onboard-mom">
+      <div class="ob-logo">K</div>
+      <div class="ob-title">Kinproof</div>
+      <div class="ob-sub">Mom's phone · family protection</div>
+      <div class="ob-perm"><span>💬</span><div><b>Facts from your ChatGPT</b><small>only what you approve · never the chat</small></div></div>
+      <div class="ob-perm"><span>📞</span><div><b>“On a call?” status</b><small>yes/no only, to catch impersonation</small></div></div>
+      <div class="ob-perm"><span>📍</span><div><b>Location</b><small>scam checks see “match / no match”; map only if everyone agrees</small></div></div>
+      <button class="ob-btn" data-onboard="mom">Agree &amp; join family</button>
+      <div class="ob-wait" id="ob-wait-mom"></div>
+    </div>
   </section>
 
   <!-- Ji-hoon -->
   <section class="phone" id="p-jihoon">
     <div class="statusbar"><span>9:41</span><span class="notch"></span><span>5G ▮▮▮</span></div>
-    <div class="room-head"><span class="back">‹</span><div class="room-title">👨 Ji-hoon <span class="room-sub">grandson · Claude</span></div><span class="menu">≡</span></div>
+    <div class="room-head"><span class="back">‹</span><div class="room-title">👨 Ji-hoon's phone <span class="room-sub">grandson · Claude</span></div><span class="menu">≡</span></div>
     <div class="room">
       <div class="presence"><span id="presence-label">📵 Not on a call</span><button id="btn-presence" class="ghost small">toggle</button></div>
       <div id="mysched-jihoon" class="mysched"></div>
       <div id="approvals-jihoon" class="approvals"></div>
+      <div id="private-jihoon" class="private"></div>
       <div id="feed-jihoon" class="feed"></div>
     </div>
     <div class="composer"><button class="sync" data-sync="jihoon_claude">↻ Sync Claude</button></div>
@@ -97,14 +123,77 @@
         <button id="btn-its-me" class="ok">It's me</button>
       </div>
     </div>
+    <div class="onboard" id="onboard-jihoon">
+      <div class="ob-logo">K</div>
+      <div class="ob-title">Kinproof</div>
+      <div class="ob-sub">Ji-hoon's phone · family protection</div>
+      <div class="ob-perm"><span>💬</span><div><b>Facts from your Claude</b><small>only what you approve · never the chat</small></div></div>
+      <div class="ob-perm"><span>📞</span><div><b>“On a call?” status</b><small>yes/no only, to catch impersonation</small></div></div>
+      <div class="ob-perm"><span>📍</span><div><b>Location</b><small>scam checks see “match / no match”; map only if everyone agrees</small></div></div>
+      <button class="ob-btn" data-onboard="jihoon">Agree &amp; join family</button>
+      <div class="ob-wait" id="ob-wait-jihoon"></div>
+    </div>
   </section>
 
+  <!-- Dad -->
+  <section class="phone" id="p-dad">
+    <div class="statusbar"><span>9:41</span><span class="notch"></span><span>5G ▮▮▮</span></div>
+    <div class="room-head"><span class="back">‹</span><div class="room-title">👨‍🦳 Dad's phone <span class="room-sub">family admin</span></div><span class="menu">≡</span></div>
+    <div class="room">
+      <div id="mysched-dad" class="mysched"></div>
+      <div id="topics-dad" class="topics"></div>
+      <div id="feed-dad" class="feed"></div>
+    </div>
+    <div class="composer"><button class="sync" data-view="map">🗺 Family map</button><button class="sync alt" data-view="hub">🏠 Home</button></div>
+    <div class="onboard" id="onboard-dad">
+      <div class="ob-logo">K</div>
+      <div class="ob-title">Kinproof</div>
+      <div class="ob-sub">Dad's phone · family protection</div>
+      <div class="ob-perm"><span>💬</span><div><b>Facts from your AI chats</b><small>only what you approve · never the chat</small></div></div>
+      <div class="ob-perm"><span>📞</span><div><b>“On a call?” status</b><small>yes/no only, to catch impersonation</small></div></div>
+      <div class="ob-perm"><span>📍</span><div><b>Location</b><small>scam checks see “match / no match”; map only if everyone agrees</small></div></div>
+      <button class="ob-btn" data-onboard="dad">Agree &amp; join family</button>
+      <div class="ob-wait" id="ob-wait-dad"></div>
+    </div>
+  </section>
+
+
+</main>
+
+<main class="hub hidden" id="hub">
+  <section class="hcard h-cal">
+    <div class="h-head"><div class="h-title">📅 Family calendar <span id="hub-cal-title" class="h-sub"></span></div>
+      <div class="h-sub">synced from everyone's AI chats · approved only</div></div>
+    <div id="hub-callbar" class="callbar hidden"></div>
+    <div id="hub-calendar" class="hub-calendar"></div>
+  </section>
+  <section class="hcard h-todo">
+    <div class="h-head"><div class="h-title">✅ 오늘 할 일 <span class="h-sub">My to-dos</span></div><div id="hub-progress" class="hub-progress"></div></div>
+    <div id="hub-me" class="hub-me"></div>
+    <div id="hub-todos" class="hub-todos"></div>
+  </section>
+  <section class="hcard h-people">
+    <div class="h-head"><div class="h-title">👨‍👩‍👦 Family now</div></div>
+    <div id="hub-people" class="hub-people"></div>
+  </section>
+  <section class="hcard h-yard">
+    <div class="h-head"><div class="h-title">🏠 Home devices <span class="sim">SIMULATED</span></div>
+      <span><button id="btn-med" class="small">💊 Medicine time</button> <button id="btn-motion" class="small">🚁 Motion in yard</button></span></div>
+    <div id="yard" class="yard"></div>
+  </section>
+  <section class="hcard h-log">
+    <div class="h-head"><div class="h-title">🤖 Agent log <span class="h-sub">every decision, newest first</span></div><span class="live-dot">LIVE</span></div>
+    <div id="hub-log" class="hub-log"></div>
+  </section>
+</main>
+
+<main class="wikiview hidden" id="wikiview">
   <!-- Wiki -->
   <section class="doc" id="p-wiki">
     <div class="doc-head"><div class="doc-title">📚 Family Wiki</div><div class="doc-sub">approved facts only · plain markdown</div></div>
     <div class="cal-head"><span id="cal-title">This week</span>
       <span id="cal-filter" class="cal-filter">
-        <button data-who="all" class="on">All</button><button data-who="grandma"><i class="o-grandma"></i>Grandma</button><button data-who="mom"><i class="o-mom"></i>Mom</button><button data-who="jihoon"><i class="o-jihoon"></i>Ji-hoon</button>
+        <button data-who="all" class="on">All</button><button data-who="grandma"><i class="o-grandma"></i>Grandma</button><button data-who="mom"><i class="o-mom"></i>Mom</button><button data-who="jihoon"><i class="o-jihoon"></i>Ji-hoon</button><button data-who="dad"><i class="o-dad"></i>Dad</button>
       </span></div>
     <div id="calendar" class="calendar"></div>
     <div id="agenda" class="agenda"></div>
@@ -114,6 +203,19 @@
   </section>
 </main>
 
+<main class="mapview hidden" id="mapview">
+  <section class="hcard m-map">
+    <div class="h-head"><div class="h-title">🗺 Family map <span class="h-sub" id="map-viewer"></span></div><div class="h-sub" id="map-count"></div></div>
+    <div class="map"><div id="leaflet" class="leaflet"></div><div id="map" class="map-overlay"></div></div>
+  </section>
+  <section class="hcard m-consent">
+    <div class="h-head"><div class="h-title">🔐 Location consent</div></div>
+    <div class="h-sub">The map is visible to the family admin only when <b>every</b> member agrees. Scam checks never show a location — they only ask “does it match?”.</div>
+    <div id="consent" class="consent"></div>
+  </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="/static/stt.js"></script>
 <script src="/static/app.js"></script>
 </body>

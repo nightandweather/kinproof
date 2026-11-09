@@ -20,7 +20,7 @@ SCRIPT = {
          "wiki_page": None, "wiki_quote": None}]},
     "나 지금 부산인데 사고 났어": {"claimed_identity": "jihoon", "signals": [
         {"type": "CONTEXT_CONTRADICTION", "quote": "나 지금 부산인데", "quote_en": "I'm in Busan",
-         "wiki_page": "jihoon", "wiki_quote": "평일엔 판교 사무실로 출근"},
+         "wiki_page": "jihoon", "wiki_quote": "평일엔 강남 사무실로 출근"},
         # wiki quote that does not exist -> must be dropped
         {"type": "DISTRESS_STORY", "quote": "사고 났어", "quote_en": "accident",
          "wiki_page": None, "wiki_quote": None}]},
@@ -29,7 +29,9 @@ SCRIPT = {
 
 def fake_structured(name, schema, system, user, model=None):
     newest = user.split("NEWEST UTTERANCE:\n")[1].split("\n")[0]
-    return SCRIPT[newest]
+    out = dict(SCRIPT[newest])
+    out.setdefault("claimed_location", "부산" if "부산" in newest else None)
+    return out
 
 
 def run(monkeypatch, jihoon_on_call: bool):
@@ -46,7 +48,7 @@ def test_scam_flow(monkeypatch):
     c = run(monkeypatch, jihoon_on_call=False)
     types = {s["type"] for s in c["signals"]}
     assert "MONEY_REQUEST" not in types                     # hallucinated quote dropped
-    assert {"FAMILY_CLAIM", "CHANNEL_SWITCH", "PRESENCE_MISMATCH", "CONTEXT_CONTRADICTION", "DISTRESS_STORY"} <= types
+    assert {"FAMILY_CLAIM", "CHANNEL_SWITCH", "PRESENCE_MISMATCH", "GPS_MISMATCH", "CONTEXT_CONTRADICTION", "DISTRESS_STORY"} <= types
     assert any(d["reason"].startswith("quote not in call") for d in c["dropped"])
     assert c["level"] == "ALERT"
     assert c["confirm_requested"]

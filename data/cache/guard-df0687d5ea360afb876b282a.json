@@ -1,0 +1,23 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "claimed_location": "부산",
+  "claimed_identity": "jihoon",
+  "signals": [
+   {
+    "type": "DISTRESS_STORY",
+    "quote": "차 사고가 났어",
+    "quote_en": "I was in a car accident.",
+    "wiki_page": null,
+    "wiki_quote": null
+   },
+   {
+    "type": "CONTEXT_CONTRADICTION",
+    "quote": "나 지금 부산인데",
+    "quote_en": "I'm in Busan now.",
+    "wiki_page": "jihoon",
+    "wiki_quote": "이번 주 월요일부터 금요일까지 판교 사무실에 출근한다."
+   }
+  ]
+ }
+}

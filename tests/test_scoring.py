@@ -48,3 +48,10 @@ def test_quote_verification_tolerates_stt_spacing():
     assert contains(transcript, "할머니, 나야 지훈이")
     assert not contains(transcript, "계좌로 보내줘")
     assert not contains(transcript, "나")  # too short to count as evidence
+
+
+def test_gps_mismatch():
+    members = {"jihoon": {"gps": "경기 성남시 판교 (회사)"}}
+    assert scoring.gps_mismatch("jihoon", "부산", members)
+    assert not scoring.gps_mismatch("jihoon", "판교", members)
+    assert not scoring.gps_mismatch("jihoon", None, members)

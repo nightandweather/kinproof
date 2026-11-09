@@ -22,9 +22,9 @@ def now() -> str:
 def _empty_call() -> dict:
     return {
         "active": False, "target": config.PROTECTED, "caller": "", "started": 0.0,
-        "transcript": [], "signals": [], "dropped": [], "claimed": None,
+        "transcript": [], "signals": [], "dropped": [], "claimed": None, "claimed_location": None,
         "score": 0, "level": "SAFE", "verdict": None, "degraded": False,
-        "failures": 0, "confirm_requested": False, "alerted": False, "busy": False,
+        "failures": 0, "confirm_requested": False, "alerted": False, "busy": False, "explain": [],
     }
 
 
@@ -32,16 +32,28 @@ def _seed_wiki() -> dict:
     return {p.stem: p.read_text(encoding="utf-8") for p in sorted(config.SEED_WIKI_DIR.glob("*.md"))}
 
 
+def _seed_events() -> list:
+    """The family's existing week, synced earlier, so new events land among real life."""
+    path = config.ROOT / "data" / "seed_events.json"
+    if not path.exists():
+        return []
+    evs = json.loads(path.read_text(encoding="utf-8"))
+    return [{**e, "id": new_id("e"), "done": False, "confirmed_by": [], "seed": True} for e in evs]
+
+
 def fresh() -> dict:
     return {
-        "members": {k: {**v, "on_call": False} for k, v in config.MEMBERS.items()},
+        "members": {k: {**v, "on_call": False, "share_location": False, "consented": False} for k, v in config.MEMBERS.items()},
         "wiki": _seed_wiki(),
         "wiki_highlights": [],
         "approvals": [],
-        "events": [],
+        "events": _seed_events(),
         "notifications": [],
         "ingest_log": [],
+        "private_topics": [],   # {id, member, topic, shared} — labels only, never chat content
         "call": _empty_call(),
+        "perimeter": {"zone": None, "status": "docked", "ts": "", "known": None},
+        "robot": {"stage": "docked", "med": "혈압약", "ts": ""},
         "mode": config.LLM_MODE,
     }
 
@@ -67,13 +79,14 @@ def reset_call():
 def notify(member: str, kind: str, text: str, **extra):
     with LOCK:
         S["notifications"].insert(0, {"id": new_id("n"), "member": member, "kind": kind,
-                                      "text": text, "ts": now(), **extra})
+                                      "text": text, "ts": now(), "done": False, **extra})
 
 
-def log(text: str):
+def log(text: str, tag: str = "sync"):
+    """Agent log shown in the hub: every decision the agent makes, newest first."""
     with LOCK:
-        S["ingest_log"].insert(0, f"{now()}  {text}")
-        del S["ingest_log"][40:]
+        S["ingest_log"].insert(0, f"{now()}  [{tag}] {text}")
+        del S["ingest_log"][120:]
 
 
 def snapshot() -> dict:

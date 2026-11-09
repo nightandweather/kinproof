@@ -7,13 +7,13 @@
   "facts": [
    {
     "about": "grandma",
-    "text": "할머니는 무릎 MRI 결과를 확인할 예정이다.",
+    "text": "무릎 MRI 결과를 확인할 예정.",
     "source_quote": "무릎 MRI 결과 듣는 날이야."
    }
   ],
   "events": [
    {
-    "title": "할머니 무릎 MRI 결과 상담",
+    "title": "서울아산병원 정형외과 무릎 MRI 결과 상담",
     "date": "2026-11-12",
     "time": "14:00",
     "owner": "grandma",
@@ -34,7 +34,7 @@
     "source_quote": "목요일 오후 2시에 엄마 모시고 서울아산병원 정형외과 가야 돼. 무릎 MRI 결과 듣는 날이야."
    },
    {
-    "title": "지훈이 할머니 댁 방문",
+    "title": "지훈의 할머니 댁 방문",
     "date": "2026-11-14",
     "time": null,
     "owner": "jihoon",
@@ -46,6 +46,10 @@
      {
       "member": "grandma",
       "message": "할머니, 토요일에 지훈이가 댁에 들르기로 했어요."
+     },
+     {
+      "member": "jihoon",
+      "message": "지훈아, 토요일에 할머니 댁에 들르기로 했어."
      }
     ],
     "source_quote": "토요일에는 지훈이가 엄마 댁에 들르기로 했어."

@@ -15,8 +15,10 @@ WEIGHTS = {
     "DISTRESS_STORY": 10,          # accident, settlement, arrest
     "CONTEXT_CONTRADICTION": 25,   # call contradicts the family wiki
     "PRESENCE_MISMATCH": 30,       # claimed person is not on a call (computed in code)
+    "GPS_MISMATCH": 25,            # caller's claimed location vs claimed person's live GPS (code)
 }
-LLM_TYPES = [t for t in WEIGHTS if t != "PRESENCE_MISMATCH"]
+CODE_TYPES = {"PRESENCE_MISMATCH", "GPS_MISMATCH"}
+LLM_TYPES = [t for t in WEIGHTS if t not in CODE_TYPES]
 
 COMBOS = [
     ({"MONEY_REQUEST", "SECRECY"}, 15),
@@ -52,3 +54,12 @@ def presence_mismatch(claimed: str | None, members: dict) -> bool:
     if not claimed or claimed not in members:
         return False
     return members[claimed].get("on_call") is False
+
+
+def gps_mismatch(claimed: str | None, claimed_location: str | None, members: dict) -> bool:
+    """Caller names a place; the claimed family member's phone is somewhere else."""
+    from verify import contains
+    if not claimed or claimed not in members or not claimed_location:
+        return False
+    gps = members[claimed].get("gps")
+    return bool(gps) and not contains(gps, claimed_location)

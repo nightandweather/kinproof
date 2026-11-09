@@ -4,6 +4,7 @@ You only EXTRACT evidence. You never score, judge, or decide. Code does that.
 
 Return:
 - claimed_identity: if the caller claims to be a family member, that member's id ({member_ids}); "authority" if they claim to be police, prosecutor, financial regulator or a bank; otherwise null. Base it on the whole transcript.
+- claimed_location: if the caller says WHERE they are as a geographic place (city, district, neighborhood, e.g. "부산", "강남"), copy that place name exactly as said; otherwise null. Not a building type like "회사" or "집".
 - signals: evidence found in the NEWEST utterance only (earlier utterances were already analyzed). Each signal:
   - type: one of {types}
     - FAMILY_CLAIM: caller says they are a family member ("할머니 나야", "저 지훈이에요"). A claim alone is not a scam.

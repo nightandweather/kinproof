@@ -1,0 +1,35 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "kept_private": [],
+  "facts": [
+   {
+    "about": "grandma",
+    "text": "할머니가 감기약을 받으려 한다.",
+    "source_quote": "감기약 타 올 거야"
+   }
+  ],
+  "events": [
+   {
+    "title": "동네 내과 방문",
+    "date": "2026-11-11",
+    "time": "15:00",
+    "owner": "grandma",
+    "involves": [
+     "grandma"
+    ],
+    "notify": [
+     {
+      "member": "mom",
+      "message": "엄마, 할머니가 수요일 오후 3시에 동네 내과에 감기약을 받으러 가신대요."
+     },
+     {
+      "member": "jihoon",
+      "message": "지훈아, 할머니가 수요일 오후 3시에 동네 내과에 감기약을 받으러 가신대."
+     }
+    ],
+    "source_quote": "수요일 오후 3시에 동네 내과 가서 감기약 타 올 거야"
+   }
+  ]
+ }
+}
