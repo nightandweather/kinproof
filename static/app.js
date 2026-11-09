@@ -474,6 +474,7 @@ const qp = new URLSearchParams(location.search).get('replay');
 if (qp) setTimeout(() => replay(qp), 800);
 
 if (!STT.supported) console.warn('Web Speech not supported: use Chrome');
+STT.say = () => {};   // no TTS: the presenter speaks; machine voices would be picked up by the mic
 // ---------- Family hub (layout from the iPad sketch) ----------
 let view = 'demo', hubMe = 'mom', todoMode = 'todo';
 const MEMBER_COLOR = { grandma: '#ff922b', mom: '#f06595', jihoon: '#339af0', dad: '#495057' };
@@ -763,17 +764,24 @@ async function story() {
 
     caption('11:02', '“Mom, it\'s me, Jun-ho. My phone broke…” — a scammer with my voice, cloned from ten seconds of video.');
     await api('/presence', { member: 'dad', on_call: false });
-    const rec = ['scam_clone', 'scam', 'scam_tts'].find((r) => S.recordings.includes(r)) || null;
-    if (rec) {
-      replay(rec);
-      await waitFor(() => S.call.confirm_requested, 40000);
-      caption('11:02', "I'm in a meeting with Do Not Disturb on, and my phone isn't on any call. Kinproof breaks through DND and asks me: “Is this you?”");
-      await waitFor(() => S.call.signals.some((s) => s.type === 'GPS_MISMATCH'), 40000);
-      caption('11:03', 'The caller says Busan. My phone says Pangyo. The family wiki agrees with my phone.');
-      await waitFor(() => S.call.level === 'ALERT', 30000); await sleep(3500);
-      caption('11:03', 'I tap “Not me”. Blocked. My wife gets the reasons — and a one-tap 112 report with the evidence.');
-      await api('/call/confirm', { member: 'dad', is_me: false }); await sleep(3800);
-    }
+    // LIVE: the presenter reads the scammer's lines into the mic; each finalized sentence goes to the guard.
+    script = 'scam'; prompterBase = 0; prompterOpen = true;
+    await api('/call/start', { caller: '010-****-7741' });
+    callListening = true;
+    STT.start({ onFinal: sendUtterance, onInterim: (t) => ($('interim').textContent = t) });
+    caption('11:02', 'Read the lines on screen — in Korean, as the scammer.');
+    await waitFor(() => S.call.transcript.length >= 1, 60000);
+    caption('11:02', 'A scammer with my voice is calling my mother.');
+    await waitFor(() => S.call.confirm_requested, 60000);
+    caption('11:02', "My phone isn't on any call and I'm in a meeting with Do Not Disturb on. Kinproof breaks through DND and asks me: “Is this you?”");
+    await waitFor(() => S.call.signals.some((s) => s.type === 'GPS_MISMATCH'), 60000);
+    caption('11:03', 'The caller says Busan. My phone says Pangyo. The family wiki agrees with my phone.');
+    const lines = (S.scripts || {}).scam || [];
+    await waitFor(() => S.call.transcript.length >= lines.length || (S.call.level === 'ALERT' && S.call.transcript.length >= 5), 60000);
+    await sleep(1500);
+    STT.stop(); callListening = false; prompterOpen = false; $('interim').textContent = '';
+    caption('11:03', 'I tap “Not me”. Blocked. My wife gets the reasons — and a one-tap 112 report.');
+    await api('/call/confirm', { member: 'dad', is_me: false }); await sleep(3800);
 
     setView('hub');
     caption('11:05', 'Home Protector: the whole family on one screen — calendar, to-dos, and a log of every decision the agent made.'); await sleep(4000);
@@ -916,5 +924,21 @@ document.addEventListener('click', async (e) => {
   const me = b.closest('.phone')?.id?.replace('p-', '') || 'dad';
   await api('/community/share', { member: me });
 });
+
+// recording mode: open /?rec=1 — one click, 3-2-1, the story plays; the presenter only narrates.
+(() => {
+  if (new URLSearchParams(location.search).get('rec') !== '1') return;
+  document.body.classList.add('rec');
+  const gate = $('recgate');
+  gate.classList.remove('hidden');
+  const go = async () => {
+    $('rg-start').style.display = 'none';
+    for (const n of [3, 2, 1]) { $('rg-count').textContent = n; await sleep(800); }
+    gate.classList.add('hidden');
+    story();
+  };
+  $('rg-start').onclick = go;   // the click also unlocks audio playback for the cloned call
+  document.addEventListener('keydown', (e) => { if (e.code === 'Space' && !gate.classList.contains('hidden')) { e.preventDefault(); go(); } });
+})();
 
 poll();

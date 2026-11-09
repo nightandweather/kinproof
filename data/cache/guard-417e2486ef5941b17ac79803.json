@@ -1,0 +1,16 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "claimed_location": null,
+  "claimed_identity": "dad",
+  "signals": [
+   {
+    "type": "CHANNEL_SWITCH",
+    "quote": "폰이 고장 나서 회사 동료 폰으로 전화했어.",
+    "quote_en": "My phone broke, so I'm calling from a coworker's phone.",
+    "wiki_page": null,
+    "wiki_quote": null
+   }
+  ]
+ }
+}
