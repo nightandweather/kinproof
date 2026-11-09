@@ -1,0 +1,103 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "kept_private": [
+   "연애 고민",
+   "게임 순위"
+  ],
+  "facts": [
+   {
+    "about": "jihoon",
+    "text": "이번 주 월·수·금 18:00~22:00에 대치동 수학학원에 있다.",
+    "source_quote": "월수금 저녁 6시부터 10시까지 대치동 수학학원"
+   }
+  ],
+  "events": [
+   {
+    "title": "지훈 수학학원",
+    "date": "2026-11-09",
+    "time": "18:00",
+    "owner": "jihoon",
+    "involves": [
+     "jihoon"
+    ],
+    "notify": [
+     {
+      "member": "mom",
+      "message": "오늘 지훈이는 18:00~22:00 대치동 수학학원에 있어요."
+     },
+     {
+      "member": "dad",
+      "message": "오늘 지훈이는 18:00~22:00 대치동 수학학원에 있어요."
+     }
+    ],
+    "source_quote": "월수금 저녁 6시부터 10시까지 대치동 수학학원"
+   },
+   {
+    "title": "지훈 수학학원",
+    "date": "2026-11-11",
+    "time": "18:00",
+    "owner": "jihoon",
+    "involves": [
+     "jihoon"
+    ],
+    "notify": [
+     {
+      "member": "mom",
+      "message": "수요일 지훈이는 18:00~22:00 대치동 수학학원에 있어요."
+     },
+     {
+      "member": "dad",
+      "message": "수요일 지훈이는 18:00~22:00 대치동 수학학원에 있어요."
+     }
+    ],
+    "source_quote": "월수금 저녁 6시부터 10시까지 대치동 수학학원"
+   },
+   {
+    "title": "지훈 수학학원",
+    "date": "2026-11-13",
+    "time": "18:00",
+    "owner": "jihoon",
+    "involves": [
+     "jihoon"
+    ],
+    "notify": [
+     {
+      "member": "mom",
+      "message": "금요일 지훈이는 18:00~22:00 대치동 수학학원에 있어요."
+     },
+     {
+      "member": "dad",
+      "message": "금요일 지훈이는 18:00~22:00 대치동 수학학원에 있어요."
+     }
+    ],
+    "source_quote": "월수금 저녁 6시부터 10시까지 대치동 수학학원"
+   },
+   {
+    "title": "지훈 할머니 댁 방문",
+    "date": "2026-11-14",
+    "time": null,
+    "owner": "jihoon",
+    "involves": [
+     "jihoon",
+     "grandma"
+    ],
+    "notify": [
+     {
+      "member": "grandma",
+      "message": "이번 토요일 오전에 지훈이가 할머니 댁에 가기로 했어요."
+     },
+     {
+      "member": "mom",
+      "message": "이번 토요일 오전에 지훈이가 할머니 댁에 가기로 했어요."
+     },
+     {
+      "member": "dad",
+      "message": "이번 토요일 오전에 지훈이가 할머니 댁에 가기로 했어요."
+     }
+    ],
+    "source_quote": "토요일 오전엔 할머니 댁 가기로 했어."
+   }
+  ]
+ }
+}

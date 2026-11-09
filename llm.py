@@ -42,11 +42,13 @@ def structured(name: str, schema: dict, system: str, user: str, model: str | Non
     model = model or config.MODEL_FAST
     path = _cache_path(name, model, system, user)
 
-    if config.LLM_MODE == "replay":
-        if path.exists():
-            return json.loads(path.read_text())["output"]
-        if not _live_available():
-            raise LLMError(f"replay cache miss: {path.name}")
+    # cache  = cache-first: reuse a recorded answer if there is one, otherwise call live and record it.
+    #          Keeps a demo chain deterministic: the same inputs always get the same outputs.
+    # replay = cache only (offline); live = always call; record = always call and overwrite.
+    if config.LLM_MODE in ("cache", "replay") and path.exists():
+        return json.loads(path.read_text())["output"]
+    if config.LLM_MODE == "replay" and not _live_available():
+        raise LLMError(f"replay cache miss: {path.name}")
 
     if not _live_available():
         raise LLMError("OPENAI_API_KEY or KP_MODEL_FAST is not set")

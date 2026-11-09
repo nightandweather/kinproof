@@ -1,0 +1,54 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "kept_private": [
+   "주식 손실 고민"
+  ],
+  "facts": [
+   {
+    "about": "dad",
+    "text": "이번 주 월요일부터 금요일까지 판교 사무실에 출근한다.",
+    "source_quote": "월요일부터 금요일까지 판교 사무실 출근이고"
+   },
+   {
+    "about": "dad",
+    "text": "11월 11일 수요일은 회의로 21시까지 바쁘다.",
+    "source_quote": "수요일은 저녁 9시까지 릴리즈 회의야."
+   },
+   {
+    "about": "grandma",
+    "text": "할머니 무릎 보호대를 주문할 생각이며, 아직 주문했다는 말은 없다.",
+    "source_quote": "엄마 무릎 보호대 하나 주문해 줘야겠다."
+   }
+  ],
+  "events": [
+   {
+    "title": "고메스퀘어 가족 저녁",
+    "date": "2026-11-13",
+    "time": "19:00",
+    "owner": "dad",
+    "involves": [
+     "dad",
+     "grandma",
+     "mom",
+     "jihoon"
+    ],
+    "notify": [
+     {
+      "member": "grandma",
+      "message": "할머니, 금요일 저녁 7시에 고메스퀘어에서 가족 저녁 예약이 있어요."
+     },
+     {
+      "member": "mom",
+      "message": "엄마, 금요일 저녁 7시 고메스퀘어 가족 저녁 예약이 있어요."
+     },
+     {
+      "member": "jihoon",
+      "message": "지훈아, 금요일 저녁 7시에 고메스퀘어에서 가족 저녁 먹기로 했어."
+     }
+    ],
+    "source_quote": "금요일 저녁 7시에 고메스퀘어에서 가족 저녁 예약했어."
+   }
+  ]
+ }
+}

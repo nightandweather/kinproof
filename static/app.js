@@ -29,7 +29,7 @@ const WEEK_START = new Date(2026, 10, 9); // Mon 9 Nov 2026 (demo "today")
 
 let calWho = 'all', script = 'scam', prompterOpen = false, prompterBase = 0;
 const dismissed = new Set();
-let S = null, wikiPage = 'jihoon', lastWikiPageHighlight = 0, lastVerdict;
+let S = null, wikiPage = 'dad', lastWikiPageHighlight = 0, lastVerdict;
 const seenEvents = new Set(), newEvents = new Set(), seenLines = new Set(), newLines = new Set();
 
 function flagNew(id, seen, fresh) {
@@ -149,12 +149,17 @@ function renderPeople() {
   const room = $('feed-mom')?.closest('.room');
   document.querySelectorAll('.room').forEach((r) => { if (r._n !== r.scrollHeight) { r._n = r.scrollHeight; } });
 
-  const jh = S.members.jihoon;
-  $('presence-label').innerHTML = (jh.on_call ? '📞 On a call' : '📵 Not on a call') + (jh.dnd && !jh.on_call ? `<span class="dnd">🔕 ${esc(jh.status || 'At work')} · Do Not Disturb</span>` : '');
+  for (const m of ['jihoon', 'dad']) {
+    const v = S.members[m], el = $('presence-label-' + m);
+    if (el) el.innerHTML = (v.on_call ? '📞 On a call' : '📵 Not on a call') + (v.dnd && !v.on_call ? `<span class="dnd">🔕 ${esc(v.status || 'At work')} · Do Not Disturb</span>` : '');
+  }
   const c = S.call;
-  const req = c.confirm_requested && c.claimed === 'jihoon' && !c.verdict;
-  $('confirm-box').className = 'confirm' + (req ? '' : ' hidden');
-  if (req) $('confirm-text').textContent = 'Someone claiming to be you is on the phone with Grandma right now.';
+  const claimed = c.claimed && S.members[c.claimed] && c.claimed !== 'grandma' ? c.claimed : null;
+  const req = c.confirm_requested && claimed && !c.verdict;
+  const box = $('confirm-box');
+  if (claimed && box.parentElement.id !== 'p-' + claimed) $('p-' + claimed)?.appendChild(box);
+  box.className = 'confirm' + (req ? '' : ' hidden');
+  if (req) $('confirm-text').textContent = `Someone claiming to be you is on the phone with Grandma right now.`;
 }
 
 
@@ -194,7 +199,7 @@ function renderPrompter() {
   box.classList.toggle('hidden', !prompterOpen || !lines.length);
   if (!prompterOpen) return;
   document.querySelectorAll('[data-script]').forEach((b) => b.classList.toggle('on', b.dataset.script === script));
-  $('prompter-title').textContent = script === 'scam' ? 'Read as the scammer' : 'Read as the real Ji-hoon';
+  $('prompter-title').textContent = script === 'scam' ? 'Read as the scammer' : 'Read as the real Dad';
   const said = Math.max(0, S.call.transcript.length - prompterBase);
   $('prompter-lines').html = lines.map((l, i) => `<div class="pl ${i < said ? 'done' : i === said ? 'now' : ''}">${esc(l)}</div>`).join('')
     + (said >= lines.length ? '<div class="pl now">Done — press End call and save it</div>' : '');
@@ -381,7 +386,7 @@ async function poll() {
 let callListening = false;
 $('btn-call').onclick = async () => {
   if (STT.running) { STT.stop(); callListening = false; return; }
-  script = S.members.jihoon.on_call ? 'real_jihoon' : 'scam';
+  script = S.members.dad.on_call ? 'real_dad' : 'scam';
   await api('/call/start', { caller: script === 'scam' ? '010-****-7741' : '010-****-2231' });
   prompterBase = 0; prompterOpen = true;
   callListening = true;
@@ -399,9 +404,9 @@ $('btn-reset').onclick = async () => {
   seenEvents.clear(); seenLines.clear();
   await api('/reset', {});
 };
-$('btn-presence').onclick = () => api('/presence', { member: 'jihoon', on_call: !S.members.jihoon.on_call });
-$('btn-its-me').onclick = () => api('/call/confirm', { member: 'jihoon', is_me: true });
-$('btn-not-me').onclick = () => api('/call/confirm', { member: 'jihoon', is_me: false });
+document.addEventListener('click', (e) => { const b = e.target.closest('[data-presence]'); if (b) api('/presence', { member: b.dataset.presence, on_call: !S.members[b.dataset.presence].on_call }); });
+$('btn-its-me').onclick = () => api('/call/confirm', { member: S.call.claimed, is_me: true });
+$('btn-not-me').onclick = () => api('/call/confirm', { member: S.call.claimed, is_me: false });
 
 // Grandma just talks: plans go straight to the family schedule, questions get answered out loud.
 let planBuf = [];
@@ -661,13 +666,13 @@ function renderReason() {
 }
 
 function renderTopics() {
-  for (const m of ['mom', 'jihoon']) {
+  for (const m of ['mom', 'jihoon', 'dad']) {
     const el = $('private-' + m);
     if (!el) continue;
     const mine = (S.private_topics || []).filter((p) => p.member === m);
     el.html = mine.length ? `<div class="sys">Kept private from your chat — only labels, never content</div>` + mine.map((p) =>
-      `<div class="pt"><span>🔒</span><span class="lb">${esc(p.topic)}<small>${p.shared ? 'Dad can see this label' : 'only you can see this'}</small></span>
-       <button class="${p.shared ? 'on' : ''}" data-topic="${p.id}">${p.shared ? 'Shared' : 'Share label with Dad'}</button></div>`).join('') : '';
+      `<div class="pt"><span>🔒</span><span class="lb">${esc(p.topic)}<small>${m === 'dad' ? 'only you can see this' : p.shared ? 'Dad can see this label' : 'only you can see this'}</small></span>
+       ${m === 'dad' ? '' : `<button class="${p.shared ? 'on' : ''}" data-topic="${p.id}">${p.shared ? 'Shared' : 'Share label with Dad'}</button>`}</div>`).join('') : '';
   }
   const shared = (S.private_topics || []).filter((p) => p.shared);
   $('topics-dad').html = `<div class="mysched"><div class="h">💭 Shared worries (opt-in by each person)</div>` + (shared.length
@@ -712,47 +717,46 @@ async function story() {
   try {
     setView('demo');
     await api('/reset', {}); seenEvents.clear(); seenLines.clear(); lastWikiPageHighlight = 0;
-    caption('', 'Meet the Kims. Grandma, 78, lives alone in a Songpa apartment. Mom is a nurse at Bundang SNU Hospital, Dad a developer in Pangyo, grandson Ji-hoon works in Gangnam.'); await sleep(4800);
-    caption('08:50', 'Each of them installs Kinproof. Protection starts only when everyone agrees.');
-    for (const m of ['grandma', 'mom', 'jihoon', 'dad']) { await sleep(700); await api('/consent', { member: m, share: true, onboarding: true }); }
+    caption('', "Meet my family. My mother, 78, lives alone in a Songpa apartment. My wife is a nurse at Bundang SNU Hospital. Our son Ji-hoon is 15 and at hagwon every night. I'm a developer in Pangyo."); await sleep(5200);
+    caption('08:50', 'Each of us installs Kinproof. Protection starts only when everyone agrees.');
+    for (const m of ['grandma', 'dad', 'mom', 'jihoon']) { await sleep(700); await api('/consent', { member: m, share: true, onboarding: true }); }
     await sleep(1500);
 
-    setView('hub');
+    setView('hub'); homeMode = 'in';
     caption('09:00', "Medicine time. The home robot brings Grandma water and today's blood-pressure pills.");
     $('btn-med').click(); await sleep(9500);
-    caption('10:40', 'The robot spots water on the kitchen floor — a slip-and-fall risk for an older adult. It warns Grandma, mops it up, and sends Mom before/after photos.');
+    caption('10:40', 'The robot spots water on the kitchen floor — a slip-and-fall risk. It warns Grandma, mops it up, and sends my wife before/after photos.');
     $('btn-spill').click(); await sleep(7000);
 
     setView('demo');
-    caption('09:20', "Mom tells ChatGPT she's taking Grandma to the hospital Thursday. Kinproof syncs the facts — never the chat.");
-    await api('/sync/mom_chatgpt', {});
-    await waitFor(() => S.approvals.some((a) => a.member === 'mom'), 30000); await sleep(1800);
-    caption('09:21', 'Mom approves. Grandma and Ji-hoon each get their reminder. Her job worries stay private.');
-    for (const a of S.approvals.filter((a) => a.member === 'mom')) { await api('/approvals/' + a.id, { decision: 'approve' }); await sleep(350); }
-    await sleep(2200);
-    caption('09:30', "Ji-hoon's Claude chat syncs too: in the Gangnam office all week.");
-    await api('/sync/jihoon_claude', {});
-    await waitFor(() => S.approvals.some((a) => a.member === 'jihoon'), 30000); await sleep(1200);
-    for (const a of S.approvals.filter((a) => a.member === 'jihoon')) { await api('/approvals/' + a.id, { decision: 'approve' }); await sleep(300); }
-    await sleep(1800);
+    const syncAndShare = async (m, sample, line) => {
+      caption(line[0], line[1]);
+      await api('/sync/' + sample, {});
+      await waitFor(() => S.approvals.some((a) => a.member === m), 30000); await sleep(1500);
+      for (const a of S.approvals.filter((a) => a.member === m)) { await api('/approvals/' + a.id, { decision: 'approve' }); await sleep(300); }
+      await sleep(1500);
+    };
+    await syncAndShare('mom', 'mom_chatgpt', ['09:20', "My wife tells ChatGPT she's taking Grandma to the hospital Thursday. Kinproof shares the appointment — not the chat. Her job worries stay private."]);
+    await syncAndShare('dad', 'dad_chatgpt', ['09:30', "My ChatGPT knows I'm at the Pangyo office all week and booked Friday dinner. That's shared. My stock losses aren't."]);
+    await syncAndShare('jihoon', 'jihoon_claude', ['09:35', "Ji-hoon's Claude has his hagwon schedule. Who he has a crush on stays with him."]);
 
     caption('10:10', 'Grandma just talks. No apps, no menus.');
     const r = await api('/voice', { member: 'grandma', text: '이번 주 금요일에 뭐 있어?' });
     if (r.reply) STT.say(r.reply);
     await sleep(5500);
 
-    caption('11:02', '“Grandma, it\'s me, Ji-hoon. My phone broke…” — a voice that sounds exactly like him.');
-    await api('/presence', { member: 'jihoon', on_call: false });
-    const rec = ['scam_clone', 'scam', 'scam_tts', 'scam_api'].find((r) => S.recordings.includes(r)) || null;
+    caption('11:02', '“Mom, it\'s me, Jun-ho. My phone broke…” — a scammer with my voice, cloned from ten seconds of video.');
+    await api('/presence', { member: 'dad', on_call: false });
+    const rec = ['scam_clone', 'scam', 'scam_tts'].find((r) => S.recordings.includes(r)) || null;
     if (rec) {
       replay(rec);
       await waitFor(() => S.call.confirm_requested, 40000);
-      caption('11:02', "Ji-hoon is at work with Do Not Disturb on, and his phone isn't on any call. Kinproof breaks through DND to ask: “Is this you?”");
+      caption('11:02', "I'm in a meeting with Do Not Disturb on, and my phone isn't on any call. Kinproof breaks through DND and asks me: “Is this you?”");
       await waitFor(() => S.call.signals.some((s) => s.type === 'GPS_MISMATCH'), 40000);
-      caption('11:03', 'The caller says Busan. Ji-hoon\'s phone says Gangnam. The family wiki agrees with the phone.');
+      caption('11:03', 'The caller says Busan. My phone says Pangyo. The family wiki agrees with my phone.');
       await waitFor(() => S.call.level === 'ALERT', 30000); await sleep(3500);
-      caption('11:03', 'The real Ji-hoon taps “Not me”. Call blocked. Mom and Dad are told why.');
-      await api('/call/confirm', { member: 'jihoon', is_me: false }); await sleep(4500);
+      caption('11:03', 'I tap “Not me”. Blocked. My wife gets the reasons — and a one-tap 112 report with the evidence.');
+      await api('/call/confirm', { member: 'dad', is_me: false }); await sleep(5000);
     }
 
     setView('hub');
@@ -763,7 +767,7 @@ async function story() {
     homeMode = 'in';
 
     setView('map');
-    caption('21:00', 'Dad, the family admin, can see where everyone is — only because everyone agreed.'); await sleep(5500);
+    caption('21:00', 'As family admin I can see where everyone is — only because everyone agreed.'); await sleep(5500);
 
     caption('', "Kinproof. Voice isn't proof anymore — family is."); await sleep(4500);
   } finally {
@@ -830,7 +834,7 @@ $('btn-laundry').onclick = () => api('/laundry', {});
 // single-phone mode: each family member opens their own phone on a real iPhone
 (() => {
   const params = new URLSearchParams(location.search);
-  const as = params.get('as') || (window.innerWidth < 600 ? 'jihoon' : null);
+  const as = params.get('as') || (window.innerWidth < 600 ? 'dad' : null);
   if (!as) return;
   document.body.classList.add('solo');
   const el = document.getElementById('p-' + as);

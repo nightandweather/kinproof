@@ -1,0 +1,16 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "claimed_location": "부산",
+  "claimed_identity": "dad",
+  "signals": [
+   {
+    "type": "SECRECY",
+    "quote": "미경이한테는 절대 말하지 마, 걱정하니까.",
+    "quote_en": "Don't tell Migyeong under any circumstances; she'll worry.",
+    "wiki_page": null,
+    "wiki_quote": null
+   }
+  ]
+ }
+}

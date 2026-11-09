@@ -22,7 +22,7 @@
     <div class="step" data-step="3"><b>3</b>Suspicious call</div>
     <div class="step" data-step="4"><b>4</b>Real family confirms</div>
   </nav>
-  <div class="solo-switch"><a href="?as=grandma" data-as="grandma">👵</a><a href="?as=mom" data-as="mom">👩</a><a href="?as=jihoon" data-as="jihoon">👨</a><a href="?as=dad" data-as="dad">👨‍🦳</a></div>
+  <div class="solo-switch"><a href="?as=grandma" data-as="grandma">👵</a><a href="?as=dad" data-as="dad">👨</a><a href="?as=mom" data-as="mom">👩</a><a href="?as=jihoon" data-as="jihoon">👦</a></div>
   <div class="views"><button data-view="demo" class="on">📱 Live demo</button><button data-view="hub">🏠 Home Protector</button><button data-view="map">🗺 Map</button><button data-view="wiki">📚 Wiki</button></div>
   <div class="controls">
     <span id="mode" class="badge">LIVE</span>
@@ -37,7 +37,7 @@
 <div id="caption" class="caption hidden"><span id="cap-time" class="cap-time"></span><span id="cap-text"></span></div>
 <div id="prompter" class="prompter hidden">
   <div class="prompter-head"><span id="prompter-title">Script</span>
-    <span class="prompter-tabs"><button data-script="scam" class="small">Scammer</button><button data-script="real_jihoon" class="small">Real Ji-hoon</button></span>
+    <span class="prompter-tabs"><button data-script="scam" class="small">Scammer</button><button data-script="real_dad" class="small">Real Dad</button></span>
     <button id="prompter-close" class="small ghost">✕</button></div>
   <div id="prompter-lines" class="prompter-lines"></div>
 </div>
@@ -46,7 +46,7 @@
   <!-- Grandma -->
   <section class="phone" id="p-grandma">
     <div class="statusbar"><span>9:41</span><span class="notch"></span><span>5G ▮▮▮</span></div>
-    <div class="room-head"><span class="back">‹</span><div class="room-title">👵 Grandma's phone <span class="room-sub">protected · 78</span></div><span class="menu">≡</span></div>
+    <div class="room-head"><span class="back">‹</span><div class="room-title">👵 Grandma's phone <span class="room-sub">Dad's mother · 78</span></div><span class="menu">≡</span></div>
     <div class="room">
       <div id="mysched-grandma" class="mysched"></div>
       <div id="call-card" class="call idle">
@@ -111,9 +111,9 @@
   <!-- Ji-hoon -->
   <section class="phone" id="p-jihoon">
     <div class="statusbar"><span>9:41</span><span class="notch"></span><span>5G ▮▮▮</span></div>
-    <div class="room-head"><span class="back">‹</span><div class="room-title">👨 Ji-hoon's phone <span class="room-sub">grandson · Claude</span></div><span class="menu">≡</span></div>
+    <div class="room-head"><span class="back">‹</span><div class="room-title">👦 Ji-hoon's phone <span class="room-sub">grandson, 15 · Claude</span></div><span class="menu">≡</span></div>
     <div class="room">
-      <div class="presence"><span id="presence-label">📵 Not on a call</span><button id="btn-presence" class="ghost small">toggle</button></div>
+      <div class="presence"><span id="presence-label-jihoon">📵 Not on a call</span><button data-presence="jihoon" class="ghost small">toggle</button></div>
       <div id="mysched-jihoon" class="mysched"></div>
       <div id="approvals-jihoon" class="approvals"></div>
       <div id="private-jihoon" class="private"></div>
@@ -145,14 +145,17 @@
   <!-- Dad -->
   <section class="phone" id="p-dad">
     <div class="statusbar"><span>9:41</span><span class="notch"></span><span>5G ▮▮▮</span></div>
-    <div class="room-head"><span class="back">‹</span><div class="room-title">👨‍🦳 Dad's phone <span class="room-sub">family admin</span></div><span class="menu">≡</span></div>
+    <div class="room-head"><span class="back">‹</span><div class="room-title">👨 Dad's phone <span class="room-sub">me · admin · ChatGPT</span></div><span class="menu">≡</span></div>
     <div class="room">
+      <div class="presence"><span id="presence-label-dad">📵 Not on a call</span><button data-presence="dad" class="ghost small">toggle</button></div>
       <div id="mysched-dad" class="mysched"></div>
+      <div id="approvals-dad" class="approvals"></div>
+      <div id="private-dad" class="private"></div>
       <div id="topics-dad" class="topics"></div>
       <div id="offers-dad" class="feed"></div>
       <div id="feed-dad" class="feed"></div>
     </div>
-    <div class="composer stack"><div class="homeask"><input id="ask-dad" placeholder="🏠 할머니 댁에 부탁하기… (예: 목욕물 받아줘)"><button data-ask="dad">보내기</button></div><div style="display:flex;gap:8px"><button class="sync" data-view="map">🗺 Family map</button><button class="sync alt" data-view="hub">🏠 Home</button></div></div>
+    <div class="composer stack"><div class="homeask"><input id="ask-dad" placeholder="🏠 할머니 댁에 부탁하기… (예: 목욕물 받아줘)"><button data-ask="dad">보내기</button></div><div style="display:flex;gap:8px"><button class="sync" data-sync="dad_chatgpt">↻ Sync ChatGPT</button><button class="sync alt" data-view="map">🗺 Map</button></div></div>
     <div class="onboard" id="onboard-dad">
       <div class="ob-logo">K</div>
       <div class="ob-title">Kinproof</div>

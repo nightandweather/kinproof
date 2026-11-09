@@ -1,0 +1,16 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "claimed_location": "부산",
+  "claimed_identity": "jihoon",
+  "signals": [
+   {
+    "type": "SECRECY",
+    "quote": "엄마한테는 절대 말하지 마, 걱정하시니까.",
+    "quote_en": "Don’t tell Mom, because she’ll worry.",
+    "wiki_page": null,
+    "wiki_quote": null
+   }
+  ]
+ }
+}

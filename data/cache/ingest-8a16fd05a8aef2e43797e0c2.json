@@ -1,0 +1,72 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "kept_private": [
+   "이직 고민"
+  ],
+  "facts": [
+   {
+    "about": "grandma",
+    "text": "할머니는 무릎 MRI 결과 상담을 앞두고 있다.",
+    "source_quote": "무릎 MRI 결과 듣는 날이야."
+   },
+   {
+    "about": "mom",
+    "text": "엄마는 11월 12일 오전 병동 근무를 마치고 바로 할머니와 병원에 간다.",
+    "source_quote": "그날 병동 근무가 오전이라 끝나고 바로 갈게."
+   }
+  ],
+  "events": [
+   {
+    "title": "할머니 서울아산병원 정형외과 진료",
+    "date": "2026-11-12",
+    "time": "14:00",
+    "owner": "mom",
+    "involves": [
+     "grandma",
+     "mom"
+    ],
+    "notify": [
+     {
+      "member": "grandma",
+      "message": "목요일 오후 2시에 엄마와 서울아산병원 정형외과에서 무릎 MRI 결과를 들으세요."
+     },
+     {
+      "member": "jihoon",
+      "message": "목요일 오후 2시에 할머니가 엄마와 무릎 MRI 결과를 들으러 병원에 가셔."
+     },
+     {
+      "member": "dad",
+      "message": "목요일 오후 2시에 엄마가 할머니를 모시고 서울아산병원 정형외과에 가요."
+     }
+    ],
+    "source_quote": "목요일 오후 2시에 어머님 모시고 서울아산병원 정형외과 가야 돼. 무릎 MRI 결과 듣는 날이야."
+   },
+   {
+    "title": "지훈이 할머니 댁 방문",
+    "date": "2026-11-14",
+    "time": null,
+    "owner": "jihoon",
+    "involves": [
+     "jihoon",
+     "grandma"
+    ],
+    "notify": [
+     {
+      "member": "grandma",
+      "message": "토요일 오전에 지훈이가 댁에 들르기로 했어요."
+     },
+     {
+      "member": "jihoon",
+      "message": "토요일 오전에 할머니 댁에 들르기로 했어."
+     },
+     {
+      "member": "dad",
+      "message": "토요일 오전에 지훈이가 할머니 댁에 들르기로 했어요."
+     }
+    ],
+    "source_quote": "토요일 오전엔 지훈이가 할머니 댁에 들르기로 했어."
+   }
+  ]
+ }
+}

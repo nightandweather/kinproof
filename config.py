@@ -13,9 +13,9 @@ MEMBERS = {
                 "gps": "서울 송파구 (집)", "lat": 37.5145, "lng": 127.1059, "status": "집", "dnd": False},
     "mom": {"name": "엄마", "name_en": "Mom", "role": "nurse · primary caregiver", "emoji": "👩",
             "gps": "경기 성남시 분당 (분당서울대병원)", "lat": 37.3520, "lng": 127.1236, "status": "병동 근무 중", "dnd": True},
-    "jihoon": {"name": "지훈", "name_en": "Ji-hoon", "role": "grandson (29)", "emoji": "👨",
-               "gps": "서울 강남 (회사)", "lat": 37.4979, "lng": 127.0276, "status": "강남 사무실 근무 중", "dnd": True},
-    "dad": {"name": "아빠", "name_en": "Dad", "role": "developer · family admin", "emoji": "👨‍🦳",
+    "jihoon": {"name": "지훈", "name_en": "Ji-hoon", "role": "grandson (15, 중3)", "emoji": "👦",
+               "gps": "서울 강남구 대치동 (학원)", "lat": 37.4946, "lng": 127.0626, "status": "대치동 학원 수업 중", "dnd": True},
+    "dad": {"name": "준호", "name_en": "Dad", "role": "me · developer · family admin", "emoji": "👨",
             "gps": "경기 성남시 판교 (카카오 판교아지트)", "lat": 37.3955, "lng": 127.1105, "status": "판교 사무실 근무 중", "dnd": True},
 }
 ADMIN = "dad"           # sees the family map once everyone consents
@@ -24,7 +24,7 @@ CAREGIVER = "mom"       # who gets scam alerts
 
 MODEL_FAST = os.getenv("KP_MODEL_FAST", "")
 MODEL_SMART = os.getenv("KP_MODEL_SMART", "") or MODEL_FAST
-LLM_MODE = os.getenv("KP_LLM_MODE", "record")  # live | record | replay
+LLM_MODE = os.getenv("KP_LLM_MODE", "cache")  # cache (default) | replay | live | record
 LLM_TIMEOUT = float(os.getenv("KP_LLM_TIMEOUT", "25"))
 TODAY = os.getenv("KP_TODAY", "2026-11-09 (Mon)")
 
