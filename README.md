@@ -118,3 +118,12 @@ Demo: **Sync ChatGPT** (Mom) and **Sync Claude** (Ji-hoon) → **Share** the pro
 - Spill photos are AI-generated stand-ins for a robot camera (labeled "simulated cam" in the UI).
 - Web Speech sends audio to Google; production would use on-device STT.
 - Next on the same wiki: medication check-ins, caregiver hand-offs, a shared scam-pattern network across families.
+
+### Coming next
+
+1. **Kinproof community app.** Families who use Kinproof share scam numbers, scripts and alerts by neighbourhood
+   (the demo's 송파구 blocklist, "reported by 2 Kinproof families nearby", is the first piece).
+2. **More IoT devices.** Smart speakers, door cameras, smart plugs and appliances join the home hub through their APIs.
+3. **Humanoid robot APIs.** Plug in home robots such as Figure, so the same family agent that sends today's robot to
+   bring Grandma her pills can drive a humanoid helper, under the same code guardrails (no door, no gas, capped bath temperature).
+4. **Proactive family agent.** Reads the shared calendar and reaches out first for low-stakes coordination, never for money.
