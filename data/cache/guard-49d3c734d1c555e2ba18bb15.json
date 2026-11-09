@@ -1,0 +1,30 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "claimed_location": "신촌",
+  "claimed_identity": "jihoon",
+  "signals": [
+   {
+    "type": "URGENCY",
+    "quote": "지금 수리비 안 주면 경찰 부른대",
+    "quote_en": "He says he’ll call the police if the repair cost isn’t paid now.",
+    "wiki_page": null,
+    "wiki_quote": null
+   },
+   {
+    "type": "MONEY_REQUEST",
+    "quote": "수리비 안 주면",
+    "quote_en": "If the repair cost isn’t paid.",
+    "wiki_page": null,
+    "wiki_quote": null
+   },
+   {
+    "type": "CONTEXT_CONTRADICTION",
+    "quote": "차 주인 아저씨가 지금 수리비 안 주면 경찰 부른대.",
+    "quote_en": "The car owner says he’ll call the police unless the repair cost is paid now.",
+    "wiki_page": "family",
+    "wiki_quote": "돈 이야기는 전화로 하지 않고 직접 만나서 한다"
+   }
+  ]
+ }
+}

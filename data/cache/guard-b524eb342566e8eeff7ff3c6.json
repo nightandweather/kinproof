@@ -1,0 +1,16 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "claimed_location": "신촌",
+  "claimed_identity": "jihoon",
+  "signals": [
+   {
+    "type": "DISTRESS_STORY",
+    "quote": "장난치다가 주차된 차를 긁었어.",
+    "quote_en": "I was fooling around and scratched a parked car.",
+    "wiki_page": null,
+    "wiki_quote": null
+   }
+  ]
+ }
+}

@@ -1,0 +1,16 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "claimed_location": "신촌",
+  "claimed_identity": "jihoon",
+  "signals": [
+   {
+    "type": "SECRECY",
+    "quote": "엄마 아빠한테는 절대 말하지 마, 혼나.",
+    "quote_en": "Don't tell Mom or Dad, or I'll get in trouble.",
+    "wiki_page": null,
+    "wiki_quote": null
+   }
+  ]
+ }
+}

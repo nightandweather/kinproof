@@ -208,7 +208,7 @@ function renderPrompter() {
   box.classList.toggle('hidden', !prompterOpen || !lines.length);
   if (!prompterOpen) return;
   document.querySelectorAll('[data-script]').forEach((b) => b.classList.toggle('on', b.dataset.script === script));
-  $('prompter-title').textContent = script === 'scam' ? 'Read as the scammer' : 'Read as the real Dad';
+  $('prompter-title').textContent = { scam: 'Scammer as Dad', scam_teen: 'Scammer as Ji-hoon (15)', real_dad: 'The real Dad' }[script] || script;
   const said = Math.max(0, S.call.transcript.length - prompterBase);
   $('prompter-lines').html = lines.map((l, i) => `<div class="pl ${i < said ? 'done' : i === said ? 'now' : ''}">${esc(l)}</div>`).join('')
     + (said >= lines.length ? '<div class="pl now">Done — press End call and save it</div>' : '');

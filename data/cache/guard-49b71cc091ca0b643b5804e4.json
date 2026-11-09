@@ -1,0 +1,8 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "claimed_location": "신촌",
+  "claimed_identity": "jihoon",
+  "signals": []
+ }
+}
