@@ -92,6 +92,10 @@ def _explain(c) -> list[str]:
     if "GPS_MISMATCH" in types:
         ko.append(f"{_josa(name, '는')} 지금 {place}에 있는데, 전화한 사람은 {c['claimed_location']}에 있다고 하네요")
         en.append(f"{name_en} is in {place} right now, but the caller says {c['claimed_location']}")
+    if state.S["members"][m].get("dnd") and not state.S["members"][m].get("on_call"):
+        status = state.S["members"][m].get("status", "근무 중")
+        ko.append(f"{status}이라 방해금지 모드예요")
+        en.append(f"{name_en} is at work with Do Not Disturb on")
     if "PRESENCE_MISMATCH" in types:
         ko.append(f"{_josa(name, '')} 폰은 지금 아무와도 통화 중이 아니에요".replace("이 폰", " 폰"))
         en.append(f"{name_en}'s phone is not on any call")
@@ -140,6 +144,9 @@ def _rescore():
         state.log(f"asked {claimed}: 'Is this you?'", "presence")
         state.notify(claimed, "confirm_request",
                      f"누군가 '{config.MEMBERS[claimed]['name']}'라며 {config.MEMBERS[config.PROTECTED]['name']}께 전화 중이에요. 본인이세요?")
+    if c["confirm_requested"] and state.S["members"].get(claimed, {}).get("dnd") and not c.get("dnd_logged"):
+        c["dnd_logged"] = True
+        state.log(f"{claimed} is in Do Not Disturb (at work) → identity check sent as an emergency, bypassing DND", "presence")
     if c["level"] == "ALERT" and not c["alerted"]:
         c["alerted"] = True
         why = c["explain"][0] if c.get("explain") and c["explain"][0] else ""

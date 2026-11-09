@@ -427,3 +427,33 @@ button.story{background:var(--mine);color:#191919}
 .share-legend b{color:var(--text)}
 .chore .days{font-size:11px;color:var(--dim);margin-left:auto;white-space:nowrap}
 .tg.chores{color:#ffc078}
+
+/* robust layout: header can wrap, views fill the rest */
+html,body{height:100%}
+body{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.topbar{flex-wrap:wrap;row-gap:8px;padding:10px 20px 8px}
+.topbar .steps{order:9;flex:1 1 100%}
+main.stage,main.hub,main.mapview,main.wikiview{flex:1;min-height:0;height:auto!important}
+.room-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.controls{flex-wrap:wrap;justify-content:flex-end;margin-left:auto}
+@media (max-width:1300px){.tag{display:none}.views button{padding:6px 9px}}
+.presence .dnd{display:block;font-size:11.5px;color:#e8590c;font-weight:700}
+.confirm .bypass{font-size:11.5px;font-weight:800;color:#c92a2a;background:#fff;border-radius:99px;padding:3px 10px}
+.person .st.dnd{background:#fff4e6;color:#e8590c}
+
+/* reason bubble: Korean only inside phones */
+.phone .reason small{display:none}
+/* single-phone mode for real iPhones: ?as=<member> or narrow screens */
+body.solo .topbar{padding:8px 12px}
+body.solo .topbar .steps, body.solo .topbar .controls, body.solo .views, body.solo .tag{display:none}
+body.solo .stage{display:block;padding:0}
+body.solo .phone{display:none;border-radius:0;padding:0;height:100%;box-shadow:none}
+body.solo .phone.me{display:flex}
+body.solo .phone .statusbar{display:none}
+body.solo .room-head{border-radius:0}
+body.solo .composer{border-radius:0;padding-bottom:max(10px,env(safe-area-inset-bottom))}
+body.solo .confirm,body.solo .onboard{inset:52px 0 0;border-radius:0}
+.solo-switch{display:none;gap:4px;margin-left:auto}
+body.solo .solo-switch{display:flex}
+.solo-switch a{font-size:18px;text-decoration:none;padding:4px 6px;border-radius:10px;background:#f1f3f5}
+.solo-switch a.on{background:var(--mine)}

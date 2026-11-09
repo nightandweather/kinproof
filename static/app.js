@@ -132,7 +132,7 @@ function renderPeople() {
   document.querySelectorAll('.room').forEach((r) => { if (r._n !== r.scrollHeight) { r._n = r.scrollHeight; } });
 
   const jh = S.members.jihoon;
-  $('presence-label').textContent = jh.on_call ? '📞 On a call' : '📵 Not on a call';
+  $('presence-label').innerHTML = (jh.on_call ? '📞 On a call' : '📵 Not on a call') + (jh.dnd && !jh.on_call ? `<span class="dnd">🔕 ${esc(jh.status || 'At work')} · Do Not Disturb</span>` : '');
   const c = S.call;
   const req = c.confirm_requested && c.claimed === 'jihoon' && !c.verdict;
   $('confirm-box').className = 'confirm' + (req ? '' : ' hidden');
@@ -208,34 +208,39 @@ function renderIdCheck() {
 }
 
 let yardTimer = null, robotTimer = null;
-const ZONES = { 'front gate': [40, 165], 'back fence': [330, 14], 'garden': [352, 150] };
-const ROBOT_AT = { docked: [150, 112], start: [150, 112], water: [118, 60], pills: [236, 58], deliver: [212, 112], taken: [212, 112], no_answer: [212, 112] };
+// 34평 (84㎡) 3-room apartment, viewBox 380x190
+const ZONES = { 'front door': [48, 168] };
+const ROBOT_AT = { docked: [176, 150], start: [176, 150], water: [96, 62], pills: [214, 92], deliver: [268, 132], taken: [268, 132], no_answer: [268, 132] };
 function renderYard() {
   if (view !== 'hub') return;
   const p = S.perimeter || {}, r = S.robot || { stage: 'docked' };
-  const [zx, zy] = ZONES[p.zone] || [30, 30];
-  const flying = p.status !== 'docked';
+  const [zx, zy] = ZONES[p.zone] || ZONES['front door'];
   const person = p.zone ? `<g><circle class="scan" cx="${zx}" cy="${zy}" r="6" fill="${p.known === false ? '#f03e3e' : '#fab005'}"/>
-    <circle cx="${zx}" cy="${zy}" r="6" fill="${p.known === false ? '#f03e3e' : '#fab005'}"/><text x="${zx + 9}" y="${zy + 4}" font-size="10" font-weight="700" fill="#343a40">${p.known === false ? 'unknown' : 'motion'}</text></g>` : '';
-  const dx = flying ? zx - 30 : 0, dy = flying ? zy - 30 - 16 : 0;
+    <circle cx="${zx}" cy="${zy}" r="6" fill="${p.known === false ? '#f03e3e' : '#fab005'}"/><text x="${zx + 9}" y="${zy + 4}" font-size="10" font-weight="700" fill="#c92a2a">${p.known === false ? 'unknown' : 'someone'}</text></g>` : '';
   const [rx, ry] = ROBOT_AT[r.stage] || ROBOT_AT.docked;
   const carry = ['pills', 'deliver', 'taken', 'no_answer'].includes(r.stage) ? '🥤💊' : r.stage === 'water' ? '🥤' : '';
-  const robotSt = { docked: '🤖 Robot charging', start: '🤖 Medicine time — heading to kitchen', water: '🤖 Got water', pills: `🤖 Got today's ${r.med}`,
+  const robotSt = { docked: '🤖 Robot charging', start: '🤖 Medicine time — to the kitchen', water: '🤖 Got water', pills: `🤖 Got today's ${r.med}`,
     deliver: '🤖 Delivered — “약 드셨어요?”', taken: `✓ Grandma took ${r.med}`, no_answer: '⚠ No answer — Mom alerted' }[r.stage] || '';
-  const droneSt = p.status === 'docked' ? '' : p.status === 'dispatched' ? ` · 🚁 flying to ${p.zone}` : p.known ? ` · ✓ family at ${p.zone}` : ` · ⚠ unknown person at ${p.zone}`;
-  $('yard').html = `<svg viewBox="0 0 380 190" preserveAspectRatio="xMidYMid meet">
-    <rect x="6" y="6" width="368" height="178" rx="14" fill="#e9f5e1" stroke="#8ce99a" stroke-width="3" stroke-dasharray="8 6"/>
-    <rect x="24" y="160" width="36" height="10" rx="3" fill="#ced4da"/><text x="22" y="155" font-size="9" fill="#495057">gate</text>
-    <circle cx="352" cy="150" r="14" fill="#b2f2bb"/><text x="336" y="178" font-size="9" fill="#495057">garden</text>
-    <rect x="90" y="34" width="190" height="112" rx="8" fill="#fff" stroke="#adb5bd" stroke-width="2"/>
-    <line x1="185" y1="34" x2="185" y2="88" stroke="#dee2e6" stroke-width="2"/><line x1="90" y1="88" x2="280" y2="88" stroke="#dee2e6" stroke-width="2"/>
-    <text x="98" y="48" font-size="9.5" fill="#868e96">kitchen 🚰</text><text x="196" y="48" font-size="9.5" fill="#868e96">medicine 💊</text>
-    <text x="98" y="140" font-size="9.5" fill="#868e96">living room</text>
-    <text x="230" y="128" font-size="20">👵</text><rect x="222" y="132" width="44" height="8" rx="3" fill="#ffd8a8"/>
-    <g class="robot" style="transform:translate(${rx - 150}px,${ry - 112}px)"><text x="140" y="120" font-size="18">🤖</text><text x="158" y="108" font-size="10">${carry}</text></g>
+  const doorSt = p.status === 'docked' ? '' : p.status === 'dispatched' ? ' · 🚪 door camera checking…' : p.known ? ' · ✓ family at the door' : ' · ⚠ stranger at the door — Mom alerted';
+  const washing = (S.ingest_log || []).some((l) => l.includes('washer')) ;
+  $('yard').html = `<svg viewBox="0 0 380 190" preserveAspectRatio="xMidYMid meet" font-family="inherit">
+    <rect x="6" y="6" width="368" height="178" rx="10" fill="#f8f9fa" stroke="#868e96" stroke-width="3"/>
+    <!-- rooms -->
+    <rect x="6" y="6" width="130" height="80" fill="#fff4e6" stroke="#ced4da"/><text x="14" y="22" font-size="10" fill="#868e96">주방·식탁 🚰</text>
+    <rect x="136" y="6" width="96" height="80" fill="#fff" stroke="#ced4da"/><text x="144" y="22" font-size="10" fill="#868e96">작은방 1</text>
+    <rect x="232" y="6" width="142" height="80" fill="#fff" stroke="#ced4da"/><text x="240" y="22" font-size="10" fill="#868e96">안방</text>
+    <rect x="320" y="6" width="54" height="42" fill="#e7f5ff" stroke="#ced4da"/><text x="326" y="22" font-size="9" fill="#868e96">욕실</text>
+    <rect x="136" y="86" width="238" height="98" fill="#fff" stroke="#ced4da"/><text x="300" y="104" font-size="10" fill="#868e96">거실</text>
+    <rect x="6" y="86" width="70" height="62" fill="#fff" stroke="#ced4da"/><text x="14" y="102" font-size="10" fill="#868e96">작은방 2</text>
+    <rect x="76" y="86" width="60" height="44" fill="#e7f5ff" stroke="#ced4da"/><text x="82" y="102" font-size="9" fill="#868e96">욕실</text>
+    <rect x="6" y="148" width="80" height="36" fill="#f1f3f5" stroke="#ced4da"/><text x="14" y="163" font-size="10" fill="#868e96">현관 🚪</text>
+    <rect x="136" y="184" width="238" height="0" stroke="#74c0fc" stroke-width="6"/><text x="320" y="178" font-size="9" fill="#4dabf7">베란다 ${washing ? '🧺✓' : '🧺'}</text>
+    <rect x="200" y="84" width="28" height="12" rx="3" fill="#ffe8cc"/><text x="203" y="94" font-size="8">💊</text>
+    <!-- grandma on sofa -->
+    <rect x="252" y="140" width="56" height="14" rx="4" fill="#ffd8a8"/><text x="268" y="138" font-size="20">👵</text>
+    <g class="robot" style="transform:translate(${rx - 176}px,${ry - 150}px)"><text x="166" y="158" font-size="18">🤖</text><text x="184" y="146" font-size="10">${carry}</text></g>
     ${person}
-    <g class="drone" style="transform:translate(${dx}px,${dy}px)"><text x="20" y="36" font-size="18">🚁</text></g>
-  </svg><div class="yard-status">${robotSt}${droneSt}</div>`;
+  </svg><div class="yard-status">${robotSt}${doorSt}</div>`;
 }
 
 function renderWiki() {
@@ -456,7 +461,8 @@ function renderHub() {
     const claimedNow = c.active && c.claimed === m && !v.on_call;
     const st = m === 'grandma' && c.active ? `<span class="st ${c.level === 'ALERT' ? 'alert' : 'on'}">📞 on a call · risk ${c.score}</span>`
       : claimedNow ? '<span class="st alert">⚠ being impersonated</span>'
-      : `<span class="st ${v.on_call ? 'on' : ''}">${v.on_call ? '📞 on a call' : '📵 not on a call'}</span>`;
+      : v.on_call ? '<span class="st on">📞 on a call</span>'
+      : v.dnd ? `<span class="st dnd">🔕 ${esc(v.status || 'at work')}</span>` : `<span class="st">🏠 ${esc(v.status || 'available')}</span>`;
     return `<div class="person"><div class="av" style="background:${AV_BG[m] || '#f1f3f5'}">${v.emoji}</div>
       <div class="nm">${esc(v.name_en)}</div><div class="gps">📍 ${esc(v.gps || '—')}</div>${st}</div>`;
   }).join('') + `<div class="person add" data-add-member="1"><span class="plus">＋</span>Add family</div>`;
@@ -507,8 +513,7 @@ document.addEventListener('click', async (e) => {
 });
 
 $('btn-motion').onclick = async () => {
-  const zones = Object.keys(ZONES);
-  const zone = zones[Math.floor(Math.random() * zones.length)];
+  const zone = 'front door';
   await api('/perimeter', { zone });
   clearTimeout(yardTimer);
   yardTimer = setTimeout(async () => {
@@ -639,7 +644,7 @@ async function story() {
   try {
     setView('demo');
     await api('/reset', {}); seenEvents.clear(); seenLines.clear(); lastWikiPageHighlight = 0;
-    caption('', 'Meet the Kims. Grandma, 78, lives alone. Mom is a nurse, Dad a developer, grandson Ji-hoon works in Gangnam.'); await sleep(4200);
+    caption('', 'Meet the Kims. Grandma, 78, lives alone in a Songpa apartment. Mom is a nurse at Bundang SNU Hospital, Dad a developer in Pangyo, grandson Ji-hoon works in Gangnam.'); await sleep(4800);
     caption('08:50', 'Each of them installs Kinproof. Protection starts only when everyone agrees.');
     for (const m of ['grandma', 'mom', 'jihoon', 'dad']) { await sleep(700); await api('/consent', { member: m, share: true, onboarding: true }); }
     await sleep(1500);
@@ -672,7 +677,7 @@ async function story() {
     if (rec) {
       replay(rec);
       await waitFor(() => S.call.confirm_requested, 40000);
-      caption('11:02', "Ji-hoon's phone isn't on any call. Kinproof asks the real Ji-hoon: “Is this you?”");
+      caption('11:02', "Ji-hoon is at work with Do Not Disturb on, and his phone isn't on any call. Kinproof breaks through DND to ask: “Is this you?”");
       await waitFor(() => S.call.signals.some((s) => s.type === 'GPS_MISMATCH'), 40000);
       caption('11:03', 'The caller says Busan. Ji-hoon\'s phone says Gangnam. The family wiki agrees with the phone.');
       await waitFor(() => S.call.level === 'ALERT', 30000); await sleep(3500);
@@ -682,7 +687,7 @@ async function story() {
 
     setView('hub');
     caption('11:05', 'Home Protector: the whole family on one screen — calendar, to-dos, and a log of every decision the agent made.'); await sleep(6000);
-    caption('19:40', 'Evening. Motion near the back of Grandma\'s yard. The drone checks and Mom gets a photo.');
+    caption('19:40', 'Evening. A stranger lingers at Grandma\'s front door. The door camera checks, Grandma is told not to open, Mom gets a photo.');
     $('btn-motion').click(); await sleep(6500);
 
     setView('map');
@@ -747,5 +752,18 @@ document.addEventListener('click', (e) => {
   if (b.dataset.ttday) { ttDay = b.dataset.ttday; calMode = 'day'; }
   render();
 });
+
+$('btn-laundry').onclick = () => api('/laundry', {});
+
+// single-phone mode: each family member opens their own phone on a real iPhone
+(() => {
+  const params = new URLSearchParams(location.search);
+  const as = params.get('as') || (window.innerWidth < 600 ? 'jihoon' : null);
+  if (!as) return;
+  document.body.classList.add('solo');
+  const el = document.getElementById('p-' + as);
+  if (el) el.classList.add('me');
+  document.querySelectorAll('[data-as]').forEach((a) => a.classList.toggle('on', a.dataset.as === as));
+})();
 
 poll();

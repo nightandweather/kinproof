@@ -46,7 +46,8 @@ class Utterance(BaseModel):
 
 class Presence(BaseModel):
     member: str
-    on_call: bool
+    on_call: bool | None = None
+    dnd: bool | None = None
 
 
 class Confirm(BaseModel):
@@ -181,14 +182,15 @@ def perimeter(body: Motion):
         per = state.S["perimeter"]
         if body.known is None:
             per.update(zone=body.zone, status="dispatched", ts=state.now(), known=None)
-            state.log(f"motion near {g}'s {body.zone} → drone dispatched (simulated sensor)", "drone")
+            state.log(f"motion at {g}'s {body.zone} → door camera checking (simulated sensor)", "home")
         else:
             per.update(status="identified", known=body.known)
             if body.known:
-                state.log(f"drone: person at {body.zone} matches family → no alert", "drone")
+                state.log(f"door camera: person at {body.zone} matches family → no alert", "home")
             else:
-                state.log(f"drone: unknown person at {body.zone} → snapshot sent to {config.CAREGIVER}", "drone")
-                state.notify(config.CAREGIVER, "alert", f"🚁 {g} 댁 {body.zone}에 모르는 사람이 있어요. 드론 사진을 보냈어요.")
+                state.log(f"door camera: unknown person lingering at {body.zone} for 40s → snapshot sent to {config.CAREGIVER}", "home")
+                state.notify(config.CAREGIVER, "alert", f"🚪 {g} 댁 현관 앞에 모르는 사람이 40초째 서 있어요. 도어캠 사진을 보냈어요. 할머니께는 문 열지 마시라고 안내했어요.")
+                state.notify(config.PROTECTED, "alert", "현관 앞에 모르는 사람이 있어요. 문 열지 마세요. 엄마에게 알렸어요.")
     return {"ok": True}
 
 
@@ -279,6 +281,17 @@ def chore_done(cid: str):
     raise HTTPException(404, cid)
 
 
+@app.post("/api/laundry")
+def laundry():
+    """SIMULATED smart washer finished -> whoever owns the drying chore gets the nudge."""
+    with state.LOCK:
+        chore = next((c for c in state.S["chores"] if "건조대" in c["title"]), None)
+    who = chore["member"] if chore else config.CAREGIVER
+    state.log(f"washer (베란다) finished → nudged {who} for '{chore['title'] if chore else 'laundry'}'", "home")
+    state.notify(who, "reminder", "🧺 세탁 끝났어요! 건조대에 널어 주세요. (오늘 집안일 담당)")
+    return {"ok": True}
+
+
 @app.post("/api/call/start")
 def call_start(body: CallStart):
     guard.start(body.caller)
@@ -294,7 +307,11 @@ def call_utterance(body: Utterance):
 @app.post("/api/presence")
 def presence(body: Presence):
     _member(body.member)
-    guard.set_presence(body.member, body.on_call)
+    if body.dnd is not None:
+        with state.LOCK:
+            state.S["members"][body.member]["dnd"] = body.dnd
+    if body.on_call is not None:
+        guard.set_presence(body.member, body.on_call)
     return {"ok": True}
 
 

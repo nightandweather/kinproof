@@ -1,10 +1,56 @@
 [
-  {"title": "설거지", "member": "dad", "days": "월·수·금", "emoji": "🍽"},
-  {"title": "욕실 청소", "member": "dad", "days": "일", "emoji": "🛁"},
-  {"title": "빨래 개기", "member": "mom", "days": "목", "emoji": "👕"},
-  {"title": "할머니 댁 장보기", "member": "mom", "days": "토", "emoji": "🛒"},
-  {"title": "분리수거", "member": "jihoon", "days": "화", "emoji": "♻️"},
-  {"title": "할머니 댁 전구 교체", "member": "jihoon", "days": "토", "emoji": "💡"},
-  {"title": "화분 물 주기", "member": "grandma", "days": "매일", "emoji": "🪴"},
-  {"title": "강아지 산책", "member": "grandma", "days": "매일 아침", "emoji": "🐕"}
+ {
+  "title": "설거지",
+  "member": "dad",
+  "days": "월·수·금",
+  "emoji": "🍽"
+ },
+ {
+  "title": "욕실 청소",
+  "member": "dad",
+  "days": "일",
+  "emoji": "🛁"
+ },
+ {
+  "title": "세탁기에 빨래 넣고 돌리기",
+  "member": "mom",
+  "days": "화·금 아침",
+  "emoji": "🧺"
+ },
+ {
+  "title": "건조대에서 빨래 걷어 개고 정리하기",
+  "member": "jihoon",
+  "days": "화·금 저녁",
+  "emoji": "👕"
+ },
+ {
+  "title": "할머니 댁 장보기",
+  "member": "mom",
+  "days": "토",
+  "emoji": "🛒"
+ },
+ {
+  "title": "분리수거",
+  "member": "jihoon",
+  "days": "화",
+  "emoji": "♻️"
+ },
+ {
+  "title": "할머니 댁 전구 교체",
+  "member": "jihoon",
+  "days": "토",
+  "emoji": "💡"
+ },
+ {
+  "title": "화분 물 주기",
+  "member": "grandma",
+  "days": "매일",
+  "emoji": "🪴"
+ },
+ {
+  "title": "강아지 산책",
+  "member": "grandma",
+  "days": "매일 아침",
+  "emoji": "🐕"
+ }
 ]
