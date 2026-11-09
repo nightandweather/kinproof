@@ -527,7 +527,7 @@ function renderHub() {
       const people = [e.owner, ...(e.involves || [])].filter((v, k, a) => a.indexOf(v) === k).map((m) => S.members[m]?.emoji || '').join(' ');
       const conf = (e.confirmed_by || []).map((w) => `<span>✓ ${esc(w)}</span>`).join('');
       const fresh = !e.seed ? '<span>✨ new from AI chat</span>' : '';
-      return `<div class="hev o-${e.owner} ${e.seed ? 'seed' : 'synced'}"><b>${evEmoji(e)} ${esc(e.title)}</b><div class="m">${esc(e.time || 'all day')} · ${people}</div><div class="badges">${fresh}${conf}</div></div>`;
+      return `<div class="hev o-${e.owner} ${e.seed ? 'seed' : 'synced'} ${window.__justEvent === e.id ? 'just' : ''}"><b>${evEmoji(e)} ${esc(e.title)}</b><div class="m">${esc(e.time || 'all day')} · ${people}</div><div class="badges">${fresh}${conf}</div></div>`;
     }).join('');
     if (i === 0 && c.verdict) {
       evs = `<div class="hev ${c.verdict === 'blocked' ? 'incident' : 'verified'}"><b>${c.verdict === 'blocked' ? '🚫 Scam call blocked' : '✅ Call verified'}</b>
@@ -746,6 +746,25 @@ function slide(html) {
   el.innerHTML = html; el.classList.remove('hidden');
   el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
 }
+async function grandmaVoiceScene() {
+  const said = '수요일 오후 3시에 내과 가서 감기약 타 올 거야';
+  const el = $('gm-said');
+  setView('demo');
+  caption('10:10', "My mother doesn't do apps. She just talks.");
+  el.innerHTML = `<span class="mic">🎤 Grandma says</span>${esc(said)}<small>“I'm going to the clinic Wednesday at 3 to get cold medicine.”</small>`;
+  el.classList.remove('hidden');
+  const before = new Set(S.events.map((e) => e.id));
+  await api('/voice', { member: 'grandma', text: said });
+  await waitFor(() => S.events.some((e) => !before.has(e.id)), 20000);
+  caption('10:10', 'Kinproof understands her, puts it on the family calendar, and tells my wife and me.');
+  await beat(4000);
+  el.classList.add('hidden');
+  setView('hub'); calMode = 'week';
+  window.__justEvent = S.events.find((e) => !before.has(e.id))?.id;
+  caption('10:11', 'There it is. Wednesday, 3pm. Nobody had to type anything.');
+  await beat(4000);
+  window.__justEvent = null;
+}
 let storyRunning = false;
 async function story() {
   if (storyRunning) return; storyRunning = true;
@@ -794,10 +813,8 @@ async function story() {
     await syncAndShare('dad', 'dad_chatgpt', ['09:30', "My ChatGPT knows I'm in Pangyo all week. That gets shared. My stock losses don't."]);
     await syncAndShare('jihoon', 'jihoon_claude', ['09:35', "Ji-hoon's hagwon schedule gets shared. His crush stays private."]);
 
-    caption('10:10', "My mother doesn't do apps. She just asks.");
-    const r = await api('/voice', { member: 'grandma', text: '이번 주 금요일에 뭐 있어?' });
-    if (r.reply) STT.say(r.reply);
-    await beat(4200);
+    await grandmaVoiceScene();
+    setView('demo');
 
     caption('11:02', '11am. “Mom, it\'s Jun-ho. My phone broke…”');
     await api('/presence', { member: 'dad', on_call: false });
@@ -971,10 +988,21 @@ document.addEventListener('click', async (e) => {
   document.body.classList.add('rec');
   const gate = $('recgate');
   gate.classList.remove('hidden');
+  const scene = new URLSearchParams(location.search).get('scene');
+  const prepareScene = async () => {
+    await api('/reset', {});
+    for (const m of ['grandma', 'dad', 'mom', 'jihoon']) await api('/consent', { member: m, share: true, onboarding: true });
+    for (const sm of ['mom_chatgpt', 'dad_chatgpt', 'jihoon_claude']) await api('/sync/' + sm, {});
+    await waitFor(() => S.approvals.length >= 3, 40000); await sleep(1500);
+    for (const a of S.approvals) await api('/approvals/' + a.id, { decision: 'approve' });
+    await sleep(800);
+  };
   const go = async () => {
     $('rg-start').style.display = 'none';
+    if (scene === 'voice') { $('rg-count').textContent = '…'; await prepareScene(); }
     for (const n of [3, 2, 1]) { $('rg-count').textContent = n; await sleep(800); }
     gate.classList.add('hidden');
+    if (scene === 'voice') { await grandmaVoiceScene(); caption('', ''); return; }
     story();
   };
   $('rg-start').onclick = go;   // the click also unlocks audio playback for the cloned call
