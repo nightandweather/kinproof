@@ -1,0 +1,25 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "kept_private": [],
+  "facts": [],
+  "events": [
+   {
+    "title": "할머니 치과 방문",
+    "date": "2026-11-17",
+    "time": "10:00",
+    "owner": "grandma",
+    "involves": [
+     "grandma"
+    ],
+    "notify": [
+     {
+      "member": "mom",
+      "message": "엄마, 할머니가 11월 17일 화요일 오전 10시에 치과에 가세요."
+     }
+    ],
+    "source_quote": "다음 주 화요일 오전 10시에 치과 가"
+   }
+  ]
+ }
+}

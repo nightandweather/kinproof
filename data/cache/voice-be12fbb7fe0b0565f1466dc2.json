@@ -1,0 +1,9 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "intent": "ask",
+  "target": null,
+  "message": null,
+  "reply": "이번 주 금요일인 13일 저녁 7시에 고메스퀘어에서 가족 저녁 식사가 있어요."
+ }
+}

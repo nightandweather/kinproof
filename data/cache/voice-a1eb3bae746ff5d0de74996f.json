@@ -1,0 +1,9 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "intent": "relay",
+  "target": "jihoon",
+  "message": "지훈아, 저녁 꼭 챙겨 먹어.",
+  "reply": "지훈이에게 저녁 꼭 챙겨 먹으라고 전할게요."
+ }
+}

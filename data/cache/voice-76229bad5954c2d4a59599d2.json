@@ -1,0 +1,9 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "intent": "call",
+  "target": "mom",
+  "message": null,
+  "reply": "네, 미경이한테 전화 걸어드릴게요."
+ }
+}

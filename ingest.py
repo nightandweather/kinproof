@@ -166,12 +166,22 @@ async def watch_inbox(interval: float = 1.5):
 
 VOICE_SCHEMA = {
     "type": "object", "additionalProperties": False,
-    "required": ["intent", "reply"],
+    "required": ["intent", "target", "message", "reply"],
     "properties": {
-        "intent": {"type": "string", "enum": ["add_plan", "ask", "other"]},
+        "intent": {"type": "string", "enum": ["add_plan", "ask", "call", "relay", "other"]},
+        "target": {"type": ["string", "null"], "enum": MEMBER_IDS + [None]},
+        "message": {"type": ["string", "null"]},
         "reply": {"type": "string"},
     },
 }
+
+
+# How Grandma refers to each family member (her replies should use her words, not the app's labels)
+ELDER_NAMES = {"dad": "준호", "mom": "미경이", "jihoon": "지훈이", "grandma": "할머니"}
+
+
+def _call_name(speaker: str, m: str) -> str:
+    return ELDER_NAMES.get(m, config.MEMBERS[m]["name"]) if speaker == config.PROTECTED else config.MEMBERS[m]["name"]
 
 
 def voice(member: str, text: str) -> dict:
@@ -181,9 +191,13 @@ def voice(member: str, text: str) -> dict:
     with state.LOCK:
         events = "\n".join(f"- {e['date']} {e['time'] or ''} {e['title']} (owner {e['owner']})" for e in state.S["events"])
         wiki = "\n\n".join(state.S["wiki"].values())
+    roster = ", ".join(f"{k}={v['name']}" for k, v in config.MEMBERS.items())
     system = ("You are a warm voice assistant for an older Korean adult. Reply in short, polite, simple Korean (1-2 sentences, 존댓말). "
-              f"Today is {config.TODAY}. intent=add_plan if they are telling a plan/appointment; ask if they ask about the family schedule or family; "
-              "other otherwise. For ask, answer ONLY from the schedule and wiki given. For add_plan, briefly confirm what you understood.")
+              f"Today is {config.TODAY}. Family ids: {roster} (준호/아들/아범 = dad, 미경/며느리/어미 = mom, 지훈/손자 = jihoon). "
+              "intent=add_plan if they are telling a plan/appointment; ask if they ask about the family schedule or family; "
+              "call if they want to phone a family member (target = that id); relay if they want a message passed to a family member "
+              "(target = id, message = the message rewritten as a short Korean text from Grandma); other otherwise. "
+              "For ask, answer ONLY from the schedule and wiki given. For add_plan, briefly confirm what you understood.")
     user = f"FAMILY SCHEDULE:\n{events}\n\nFAMILY WIKI:\n{wiki}\n\n{name} said: {text}"
     try:
         out = llm.structured("voice", VOICE_SCHEMA, system, user)
@@ -199,7 +213,18 @@ def voice(member: str, text: str) -> dict:
             new = [e for e in state.S["events"] if e["id"] not in before]
             told = sorted({n["member"] for n in state.S["notifications"] if n.get("event") in {e["id"] for e in new}})
         if told:
-            reply += " " + ", ".join(config.MEMBERS[m]["name"] for m in told if m in config.MEMBERS) + "에게도 알려드렸어요."
+            reply += " " + ", ".join(_call_name(member, m) for m in told if m in config.MEMBERS) + "에게도 알려드렸어요."
+    target = out.get("target")
+    if out["intent"] == "call" and target in config.MEMBERS:
+        tn = _call_name(member, target)
+        state.notify(target, "alert", f"📞 {name}가 지금 통화를 원하세요. 할머니께 전화해 주세요.")
+        state.log(f"{name} asked to call {target} → call request sent to {tn}'s phone", "voice")
+        reply = f"{tn}에게 전화 연결을 요청했어요. 곧 전화 올 거예요."
+    elif out["intent"] == "relay" and target in config.MEMBERS and out.get("message"):
+        tn = _call_name(member, target)
+        state.notify(target, "reminder", f"💬 {name}: {out['message']}")
+        state.log(f"{name} → {target}: “{out['message']}” (relayed by voice)", "voice")
+        reply = f"{tn}에게 전해 드렸어요."
     state.notify(member, "info", reply)
     state.log(f"🔊 reply to {name}: {reply}", "voice")
     state.persist()

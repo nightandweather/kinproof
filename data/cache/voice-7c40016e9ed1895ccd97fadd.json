@@ -1,0 +1,9 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "intent": "call",
+  "target": "dad",
+  "message": null,
+  "reply": "네, 준호에게 전화할게요."
+ }
+}

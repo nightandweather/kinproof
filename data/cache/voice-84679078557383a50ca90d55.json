@@ -1,0 +1,9 @@
+{
+ "model": "gpt-6-sol",
+ "output": {
+  "intent": "add_plan",
+  "target": null,
+  "message": null,
+  "reply": "다음 주 화요일인 11월 17일 오전 10시에 치과 가시는 일정이시군요."
+ }
+}
