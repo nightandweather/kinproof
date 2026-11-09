@@ -66,6 +66,23 @@ pytest -q
 Demo: **Sync ChatGPT** (Mom) and **Sync Claude** (Ji-hoon) → **Share** the proposals → **Start live call** and read
 `data/scenarios/scam_ko.txt` → Ji-hoon taps **Not me**. Saved calls can be replayed from the **Replay** menu or `?replay=scam`.
 
+## Business model (assumptions marked)
+
+- **Family plan: ₩9,900 / month** (~$7) for up to 6 members — one subscription protects the elder, the whole family uses it.
+- **Why families pay:** the average 2025 voice-phishing loss in Korea was ~₩53.8M per case (police data via National Assembly analysis).
+  Preventing **one** case equals **~453 family-years** of subscription.
+- **Korea scenarios** (assumption: ~2M older adults living alone — verify):
+
+  | Adoption | Families | ARR |
+  |---|---|---|
+  | 0.5% | 10,000 | ₩1.19B (~$0.9M) |
+  | 1% | 20,000 | ₩2.38B (~$1.7M) |
+  | 5% | 100,000 | ₩11.9B (~$8.6M) |
+
+- **B2B2C channels:** telcos (add-on next to existing anti-phishing services), banks and insurers (fewer fraud payouts),
+  local governments' elder-care programs for seniors living alone.
+- **Cost structure:** model calls happen only on chat sync, voice requests and suspicious calls — no always-on streaming to the cloud.
+
 ## Honest limits / roadmap
 
 - ChatGPT/Claude subscriptions have no public API for pulling chats. The demo syncs exported conversations; the product
